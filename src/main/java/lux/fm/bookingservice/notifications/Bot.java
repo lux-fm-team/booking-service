@@ -2,6 +2,8 @@ package lux.fm.bookingservice.notifications;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lux.fm.bookingservice.exception.NotificationException;
+import lux.fm.bookingservice.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -17,6 +19,7 @@ public class Bot extends TelegramLongPollingBot {
     private String botUsername;
     @Value("${bot.token}")
     private String botToken = "";
+    private final UserRepository userRepository;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -46,7 +49,8 @@ public class Bot extends TelegramLongPollingBot {
      */
 
     public void setSendMessageToAll(String text) {
-        //TODO: send message for all users
+        userRepository.getAllByTelegramIdIsNotNull()
+                .forEach(id -> sendMessageToUser(text, id));
     }
 
     /**
@@ -57,6 +61,10 @@ public class Bot extends TelegramLongPollingBot {
      */
 
     public void sendMessageToUser(String text, Long id) {
-        //TODO: send message for user
+        try {
+            execute(new SendMessage(text, id.toString()));
+        } catch (TelegramApiException e) {
+            throw new NotificationException("Can't send message to user with id " + id);
+        }
     }
 }
