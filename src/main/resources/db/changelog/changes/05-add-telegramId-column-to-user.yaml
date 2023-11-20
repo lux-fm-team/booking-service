@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-telegramId-column-to-user
+      author: Dmytro
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: telegram_id
+                  type: bigint
+
