@@ -51,6 +51,8 @@ public class User implements UserDetails {
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
+    @Column(name = "telegram_id")
+    private Long telegramId;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
