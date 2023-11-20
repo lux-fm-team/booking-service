@@ -9,3 +9,7 @@ databaseChangeLog:
       file: db/changelog/changes/04-insert-roles-to-db.yaml
   - include:
       file: db/changelog/changes/05-add-telegramId-column-to-user.yaml
+  - include:
+      file: db/changelog/changes/06-create-accommodation-table.yaml
+  - include:
+      file: db/changelog/changes/07-create-amenities-table.yaml
