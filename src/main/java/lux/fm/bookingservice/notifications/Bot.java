@@ -9,7 +9,11 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.List;
 
 @Component
 @Getter
@@ -31,28 +35,17 @@ public class Bot extends TelegramLongPollingBot {
                 sendMessage.setText("OK");
                 sendMessage.setChatId(chatId);
             } else {
-                sendMessage.setText("Command is not in list");
+                sendMessage.setText("Command is not recognised");
                 sendMessage.setChatId(chatId);
             }
             try {
                 execute(sendMessage);
             } catch (TelegramApiException e) {
-                throw new RuntimeException(e.getMessage());
+                throw new NotificationException(
+                        "Couldn't send message in chat" + sendMessage.getChatId(), e);
             }
         }
     }
-
-    /**
-     * Sending message for all users in db
-     *
-     * @param text text of message
-     */
-
-    public void setSendMessageToAll(String text) {
-        userRepository.getAllByTelegramIdIsNotNull()
-                .forEach(id -> sendMessageToUser(text, id));
-    }
-
     /**
      * Sending message to user with specified id
      *

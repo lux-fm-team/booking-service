@@ -14,9 +14,4 @@ public class TelegramNotificationService implements NotificationService {
     public void notifyUser(User user, String message) {
         bot.sendMessageToUser(message, user.getTelegramId());
     }
-
-    @Override
-    public void notifyAllUsers(String message) {
-        bot.setSendMessageToAll(message);
-    }
 }
