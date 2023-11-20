@@ -28,6 +28,6 @@ public class AccommodationServiceImpl implements AccommodationService {
         return accommodationRepository.findById(id)
                 .map(accommodationMapper::toDto)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Can't find accommodation with id " + id));
+                        "No accommodation with id " + id));
     }
 }
