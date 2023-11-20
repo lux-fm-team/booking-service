@@ -14,10 +14,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @EntityGraph(attributePaths = "roles")
     Optional<User> findByEmail(String email);
-
-    @Query("""
-            SELECT u.telegramId
-            FROM User u
-            WHERE u.telegramId IS NOT NULL AND u.isDeleted = false""")
-    List<Long> getAllByTelegramIdIsNotNull();
 }
