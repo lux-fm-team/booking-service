@@ -1,7 +1,6 @@
 package lux.fm.bookingservice.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.security.JwtAuthenticationFilter;
@@ -38,10 +37,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth.requestMatchers(
-                                        antMatcher("/api/auth/**"),
-                                        antMatcher("/error"),
-                                        antMatcher("/swagger-ui/**"),
-                                        antMatcher("/v3/api-docs/**")
+                                        "/api/auth/**",
+                                        "/error",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**"
                                 )
                                 .permitAll()
                                 .anyRequest()
