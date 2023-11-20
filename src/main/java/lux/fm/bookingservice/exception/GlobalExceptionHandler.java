@@ -31,16 +31,9 @@ public class GlobalExceptionHandler {
         return new ErrorsResponseWrapper(LocalDateTime.now(), "bad-request", errors);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ErrorResponseWrapper handleConstraintViolationException(
-            ConstraintViolationException ex) {
-        return new ErrorResponseWrapper(LocalDateTime.now(), "bad-request", ex.getMessage());
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
+    @ExceptionHandler({AuthenticationException.class, ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ErrorResponseWrapper handleAuthenticationException(AuthenticationException ex) {
+    protected ErrorResponseWrapper handleAuthenticationException(RuntimeException ex) {
         return new ErrorResponseWrapper(LocalDateTime.now(), "bad-request", ex.getMessage());
     }
 
