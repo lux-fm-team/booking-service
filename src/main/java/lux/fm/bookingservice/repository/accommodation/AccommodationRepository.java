@@ -1,4 +1,4 @@
-package lux.fm.bookingservice.dao;
+package lux.fm.bookingservice.repository.accommodation;
 
 import lux.fm.bookingservice.model.Accommodation;
 import org.springframework.data.jpa.repository.JpaRepository;
