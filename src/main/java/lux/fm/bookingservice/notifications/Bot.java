@@ -9,6 +9,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 @Getter
 @RequiredArgsConstructor
@@ -46,7 +49,7 @@ public class Bot extends TelegramLongPollingBot {
      */
 
     public void setSendMessageToAll(String text) {
-        //TODO: send message for ll users
+        //TODO: send message for all users
     }
 
     /**
@@ -57,6 +60,6 @@ public class Bot extends TelegramLongPollingBot {
      */
 
     public void sendMessageToUser(String text, Long id) {
-        //TODO:
+        //TODO: send message for user
     }
 }
