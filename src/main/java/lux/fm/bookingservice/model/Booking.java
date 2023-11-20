@@ -7,29 +7,29 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
-
 public class Booking {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-
-    @Column(nullable = false)
+    private Long id;
+    
     @ManyToOne
-    User user;
+    private User user;
 
     @Column(nullable = false)
-    Status status = Status.PENDING;
+    private Status status = Status.PENDING;
 
-    @Column(nullable = false)
-    LocalDate checkIn = LocalDate.now();
+    @ManyToOne
+    private Accommodation accommodation;
 
-    @Column(nullable = false)
-    LocalDate checkOut;
+    @Column(name = "check_in", nullable = false)
+    private LocalDate checkIn;
 
-    //TODO accommodation relation after implementation
+    @Column(name = "check_out", nullable = false)
+    private LocalDate checkOut;
 }
