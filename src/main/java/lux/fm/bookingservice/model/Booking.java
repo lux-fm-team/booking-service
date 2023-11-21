@@ -1,5 +1,6 @@
 package lux.fm.bookingservice.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -47,4 +49,7 @@ public class Booking {
 
     @Column(name = "life_time", nullable = false)
     private LocalTime lifeTime = LocalTime.now().plusMinutes(20);
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Payment payment;
 }
