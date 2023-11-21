@@ -45,7 +45,8 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponseDtoWithRoles updateUserRoles(
-            @PathVariable @Positive Long id, @RequestBody @Valid UpdateUserRolesRequestDto requestDto
+            @PathVariable @Positive Long id,
+            @RequestBody @Valid UpdateUserRolesRequestDto requestDto
     ) {
         return userService.updateUserRoles(id, requestDto);
     }
