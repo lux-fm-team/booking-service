@@ -11,7 +11,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import java.net.URL;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,11 +28,11 @@ public class Payment {
     private PaymentStatus status;
 
     @OneToOne
-    @JoinColumn(name = "booking_id")
+    @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 
     @Column(nullable = false)
-    private URL sessionUrl;
+    private String sessionUrl;
 
     @Column(nullable = false)
     private String sessionId;
