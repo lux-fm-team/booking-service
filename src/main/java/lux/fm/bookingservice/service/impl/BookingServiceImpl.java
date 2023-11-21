@@ -103,7 +103,6 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.delete(booking);
     }
 
-
     private User getCurrentlyAuthenticatedUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(username).get();
