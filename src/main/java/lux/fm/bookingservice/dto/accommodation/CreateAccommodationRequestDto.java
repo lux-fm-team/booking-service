@@ -2,22 +2,22 @@ package lux.fm.bookingservice.dto.accommodation;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.List;
 import lux.fm.bookingservice.model.AccommodationType;
 
 public record CreateAccommodationRequestDto(
-        @NotBlank
+        @NotNull
         AccommodationType type,
         @NotBlank
         String location,
         @NotBlank
         String size,
-        @NotBlank
-        List<String> amenities,
         @NotNull
-        @PositiveOrZero
+        List<@NotBlank String> amenities,
+        @NotNull
+        @Positive
         BigDecimal dailyRate,
         @NotNull
         Integer availability
