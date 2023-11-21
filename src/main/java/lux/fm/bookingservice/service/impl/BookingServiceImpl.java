@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingRequestDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
+import lux.fm.bookingservice.exception.BookingException;
+import lux.fm.bookingservice.exception.EntityNotFoundException;
 import lux.fm.bookingservice.mapper.BookingMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
@@ -85,9 +87,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private User getCurrentlyAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return userRepository.findByEmail(userDetails.getUsername())
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(name)
                 .get();
     }
 
@@ -102,11 +103,11 @@ public class BookingServiceImpl implements BookingService {
         LocalDate today = LocalDate.now();
 
         if (request.checkIn().isBefore(today) || request.checkIn().isAfter(request.checkOut())) {
-            throw new RuntimeException("Bad date request");
+            throw new BookingException("Bad date request");
         }
 
         Accommodation accommodation = accommodationRepository.findById(request.accommodationId())
-                .orElseThrow(() -> new RuntimeException("No such")
+                .orElseThrow(() -> new EntityNotFoundException("No such accommodation")
                 );
 
         Long count = bookingRepository.countBookingsInDate(
@@ -116,7 +117,7 @@ public class BookingServiceImpl implements BookingService {
         );
 
         if (count >= accommodation.getAvailability()) {
-            throw new RuntimeException("Not available accommodation");
+            throw new BookingException("Not available accommodation");
         }
     }
 

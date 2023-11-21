@@ -76,9 +76,13 @@ public class BookingController {
         return bookingService.findBookingById(authentication.getName(), id);
     }
 
+    @Operation(
+            summary = "Create a new booking",
+            description = "Creates a new booking"
+    )
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
-    public BookingResponseDto addBooking(@RequestBody BookingRequestDto request) {
+    public BookingResponseDto addBooking(@RequestBody @Valid BookingRequestDto request) {
         return bookingService.addBooking(request);
     }
 

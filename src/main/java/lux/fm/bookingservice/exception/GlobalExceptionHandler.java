@@ -55,12 +55,10 @@ public class GlobalExceptionHandler {
         return new ErrorResponseWrapper(LocalDateTime.now(), "entity-not-found", ex.getMessage());
     }
 
-    @ExceptionHandler(BookingInvalidDateException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    protected ErrorResponseWrapper handleBookingInvalidDateException(
-            BookingInvalidDateException ex) {
-        return new ErrorResponseWrapper(LocalDateTime.now(), "booking-invalid-date",
-                ex.getMessage());
+    @ExceptionHandler(BookingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ErrorResponseWrapper handleBookingException(BookingException ex) {
+        return new ErrorResponseWrapper(LocalDateTime.now() , "bad-request" , ex.getMessage());
     }
 
     private String getErrorMessage(ObjectError e) {
