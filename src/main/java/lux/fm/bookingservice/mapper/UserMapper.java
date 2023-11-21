@@ -20,6 +20,8 @@ public interface UserMapper {
 
     UserResponseDto toDto(User user);
 
+    UserResponseDtoWithRoles toDtoWithRoles(User user);
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void mapUpdateRequestToUser(
             UpdateUserRequestDto updateBookRequestDto, @MappingTarget User user
