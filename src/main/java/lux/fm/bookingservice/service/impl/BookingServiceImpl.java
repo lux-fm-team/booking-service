@@ -1,17 +1,24 @@
 package lux.fm.bookingservice.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lux.fm.bookingservice.dto.booking.BookingRequestDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
-import lux.fm.bookingservice.exception.BookingInvalidDateException;
 import lux.fm.bookingservice.mapper.BookingMapper;
+import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Status;
+import lux.fm.bookingservice.model.User;
+import lux.fm.bookingservice.repository.accommodation.AccommodationRepository;
 import lux.fm.bookingservice.repository.booking.BookingRepository;
+import lux.fm.bookingservice.repository.user.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,21 +26,19 @@ import org.springframework.stereotype.Service;
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
+    private final AccommodationRepository accommodationRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public List<BookingResponseDto> findBookingsByUserIdAndStatus(
-            Long userId,
-            Status status) {
+    public List<BookingResponseDto> findBookingsByUserIdAndStatus(Long userId, Status status) {
         return bookingRepository.findByUserIdAndStatus(userId, status)
-                .stream()
-                .map(bookingMapper::toDto)
+                .stream().map(bookingMapper::toDto)
                 .toList();
     }
 
     @Override
     public List<BookingResponseDto> findMyBookings(String username) {
-        return bookingRepository.findBookingsByUserEmail(username)
-                .stream()
+        return bookingRepository.findBookingsByUserEmail(username).stream()
                 .map(bookingMapper::toDto)
                 .toList();
     }
@@ -51,7 +56,6 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("User with such id doesn't exist: " + id)
         );
-        validateDates(requestUpdateDto.checkIn(), requestUpdateDto.checkOut(), booking);
         bookingMapper.update(requestUpdateDto, booking);
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
@@ -64,14 +68,56 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(Status.CANCELED);
         bookingRepository.save(booking);
     }
+    }
 
-    private void validateDates(LocalDate checkIn, LocalDate checkOut, Booking booking) {
-        if ((checkIn != null && booking.getCheckOut().isBefore(checkIn))
-                || (checkOut != null && booking.getCheckIn().isAfter(checkOut))
-        ) {
-            throw new BookingInvalidDateException(
-                    "CheckOut date can't be earlier than checkIn date"
-            );
+    @Override
+    public BookingResponseDto addBooking(BookingRequestDto request) {
+        validate(request);
+
+        User user = getCurrentlyAuthenticatedUser();
+        Booking booking = new Booking();
+        booking.setUser(user);
+        booking.setAccommodation(getAccommodation(request.accommodationId()));
+        booking.setCheckIn(request.checkIn());
+        booking.setCheckOut(request.checkOut());
+        booking.setStatus(Status.PENDING);
+        return bookingMapper.toDto(bookingRepository.save(booking));
+    }
+
+    private User getCurrentlyAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return userRepository.findByEmail(userDetails.getUsername())
+                .get();
+    }
+
+    private Accommodation getAccommodation(Long id) {
+        return accommodationRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("No such accommodation")
+        );
+    }
+
+    private void validate(BookingRequestDto request) {
+
+        LocalDate today = LocalDate.now();
+
+        if (request.checkIn().isBefore(today) || request.checkIn().isAfter(request.checkOut())) {
+            throw new RuntimeException("Bad date request");
+        }
+
+        Accommodation accommodation = accommodationRepository.findById(request.accommodationId())
+                .orElseThrow(() -> new RuntimeException("No such")
+                );
+
+        Long count = bookingRepository.countBookingsInDate(
+                accommodation.getId(),
+                request.checkIn(),
+                request.checkOut()
+        );
+
+        if (count >= accommodation.getAvailability()) {
+            throw new RuntimeException("Not available accommodation");
         }
     }
+
 }
