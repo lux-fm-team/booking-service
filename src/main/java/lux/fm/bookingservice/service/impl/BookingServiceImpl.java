@@ -1,7 +1,9 @@
 package lux.fm.bookingservice.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.mapper.BookingMapper;
 import lux.fm.bookingservice.model.Booking;
@@ -43,5 +45,14 @@ public class BookingServiceImpl implements BookingService {
                 .map(bookingMapper::toDto)
                 .findFirst()
                 .get();
+    }
+
+    @Override
+    public BookingResponseDto updateBookById(BookingRequestUpdateDto requestUpdateDto, Long id) {
+        Booking booking = bookingRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("User with such id doesn't exist: " + id)
+        );
+        bookingMapper.update(requestUpdateDto, booking);
+        return bookingMapper.toDto(booking);
     }
 }
