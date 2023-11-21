@@ -17,11 +17,15 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "bookings")
+@SQLDelete(sql = "UPDATE bookings SET status='CANCELED' where id = ?")
+@Where(clause = "status != 'CANCELED'")
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +43,10 @@ public class Booking {
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation;
 
-    @Column(name = "check_in")
+    @Column(name = "check_in", nullable = false)
     private LocalDate checkIn;
 
-    @Column(name = "check_out")
+    @Column(name = "check_out", nullable = false)
     private LocalDate checkOut;
 
     @Column(name = "life_time", nullable = false)
