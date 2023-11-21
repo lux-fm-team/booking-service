@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id:
+      id: add-column-life_time-bookings-table
       author: a.parashchuk
       changes:
         - addColumn:
