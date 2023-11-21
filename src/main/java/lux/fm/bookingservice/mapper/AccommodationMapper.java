@@ -1,17 +1,11 @@
 package lux.fm.bookingservice.mapper;
 
+import lux.fm.bookingservice.config.MapperConfig;
 import lux.fm.bookingservice.dto.accommodation.AccommodationDto;
 import lux.fm.bookingservice.model.Accommodation;
-import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
-import org.mapstruct.NullValueCheckStrategy;
 
-@Mapper(
-        componentModel = "spring",
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-        implementationPackage = "<PACKAGE_NAME>.impl"
-)
+@Mapper(config = MapperConfig.class)
 public interface AccommodationMapper {
     AccommodationDto toDto(Accommodation accommodation);
 
