@@ -59,7 +59,7 @@ public class BookingController {
     public List<BookingResponseDto> getMyBookings(
             Authentication authentication
     ) {
-        return bookingService.findMyBookings(authentication.getName());
+        return bookingService.findUserBookings(authentication.getName());
     }
 
     @Operation(
@@ -84,9 +84,10 @@ public class BookingController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('CUSTOMER')")
     public BookingResponseDto updateBookingById(
+            Authentication authentication,
             @RequestBody @Valid BookingRequestUpdateDto requestUpdateDto,
             @PathVariable @Positive Long id) {
-        return bookingService.updateBookingById(requestUpdateDto, id);
+        return bookingService.updateBookingById(authentication.getName(), requestUpdateDto, id);
     }
 
     @Operation(
@@ -96,8 +97,10 @@ public class BookingController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('CUSTOMER')")
-    public void deleteBookById(@PathVariable @Positive Long id) {
-        bookingService.deleteBookingById(id);
+    public void deleteBookById(
+            Authentication authentication,
+            @PathVariable @Positive Long id) {
+        bookingService.deleteBookingById(authentication.getName(), id);
     }
 
     @Operation(
@@ -107,7 +110,9 @@ public class BookingController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('CUSTOMER')")
-    public BookingResponseDto addBooking(@RequestBody @Valid BookingRequestCreateDto request) {
-        return bookingService.addBooking(request);
+    public BookingResponseDto addBooking(
+            Authentication authentication,
+            @RequestBody @Valid BookingRequestCreateDto request) {
+        return bookingService.addBooking(authentication, request);
     }
 }

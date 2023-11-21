@@ -1,6 +1,7 @@
 package lux.fm.bookingservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
@@ -14,9 +15,8 @@ import lux.fm.bookingservice.model.Status;
 import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.accommodation.AccommodationRepository;
 import lux.fm.bookingservice.repository.booking.BookingRepository;
-import lux.fm.bookingservice.repository.user.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,7 +25,19 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
-    private final UserRepository userRepository;
+
+    @Override
+    public BookingResponseDto addBooking(
+            Authentication authentication,
+            BookingRequestCreateDto request
+    ) {
+        validateAvailablePlaces(request.accommodationId(), request.checkIn(), request.checkOut());
+        Accommodation accommodation = getAccommodation(request.accommodationId());
+        Booking booking = bookingMapper.toModel(request);
+        booking.setUser((User) authentication.getPrincipal());
+        booking.setAccommodation(accommodation);
+        return bookingMapper.toDto(bookingRepository.save(booking));
+    }
 
     @Override
     public List<BookingResponseDto> findBookingsByUserIdAndStatus(Long userId, Status status) {
@@ -35,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> findMyBookings(String username) {
+    public List<BookingResponseDto> findUserBookings(String username) {
         return bookingRepository.findBookingsByUserEmail(username).stream()
                 .map(bookingMapper::toDto)
                 .toList();
@@ -50,33 +62,30 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResponseDto updateBookingById(BookingRequestUpdateDto requestUpdateDto, Long id) {
-        Booking booking = bookingRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("User with such id doesn't exist: " + id)
+    public BookingResponseDto updateBookingById(
+            String username, BookingRequestUpdateDto requestUpdateDto, Long id) {
+        Booking booking = bookingRepository.findBookingByUserEmailAndId(username, id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Booking with such id doesn't exist: " + id
+                )
+        );
+        validateAvailablePlaces(
+                booking.getAccommodation().getId(),
+                requestUpdateDto.checkIn(),
+                requestUpdateDto.checkOut()
         );
         bookingMapper.update(requestUpdateDto, booking);
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
 
     @Override
-    public void deleteBookingById(Long id) {
-        Booking booking = bookingRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("User with such id doesn't exist: " + id)
+    public void deleteBookingById(String username, Long id) {
+        Booking booking = bookingRepository.findBookingByUserEmailAndId(username, id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Booking with such id doesn't exist: " + id
+                )
         );
         bookingRepository.delete(booking);
-    }
-
-    @Override
-    public BookingResponseDto addBooking(BookingRequestCreateDto request) {
-        validate(request);
-        User user = getCurrentlyAuthenticatedUser();
-        Booking booking = bookingMapper.toModel(request, user);
-        return bookingMapper.toDto(bookingRepository.save(booking));
-    }
-
-    private User getCurrentlyAuthenticatedUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(username).get();
     }
 
     private Accommodation getAccommodation(Long id) {
@@ -85,19 +94,21 @@ public class BookingServiceImpl implements BookingService {
         );
     }
 
-    private void validate(BookingRequestCreateDto request) {
-        Accommodation accommodation = accommodationRepository.findById(request.accommodationId())
+    private void validateAvailablePlaces(
+            Long accommodationId,
+            LocalDate checkInDate,
+            LocalDate checkOutDate
+    ) {
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Accommodation doesn't exist with id: " + request.accommodationId()
+                        "Accommodation doesn't exist with id: " + accommodationId
                 ));
         Long count = bookingRepository.countBookingsInDate(
-                accommodation.getId(),
-                request.checkIn(),
-                request.checkOut()
+                accommodation.getId(), checkInDate, checkOutDate
         );
         if (count >= accommodation.getAvailability()) {
             throw new BookingException(
-                    "The accommodation isn't available with id: " + request.accommodationId()
+                    "The accommodation isn't available with id: " + accommodationId
             );
         }
     }
