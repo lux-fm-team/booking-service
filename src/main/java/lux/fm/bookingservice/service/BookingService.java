@@ -12,6 +12,7 @@ public interface BookingService {
     List<BookingResponseDto> findMyBookings(String token);
 
     BookingResponseDto findBookingById(String token, Long id);
+
     BookingResponseDto addBooking(BookingRequestDto request);
 
     BookingResponseDto updateBookingById(BookingRequestUpdateDto requestUpdateDto, Long id);
