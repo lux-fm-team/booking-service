@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BookingException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ErrorResponseWrapper handleBookingException(BookingException ex) {
-        return new ErrorResponseWrapper(LocalDateTime.now() , "bad-request" , ex.getMessage());
+        return new ErrorResponseWrapper(LocalDateTime.now(), "bad-request", ex.getMessage());
     }
 
     private String getErrorMessage(ObjectError e) {
