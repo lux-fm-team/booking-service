@@ -5,7 +5,6 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.cglib.core.Local;
 
 @RequiredArgsConstructor
 public class BookingDatesValidator implements ConstraintValidator<BookingDatesValid, Object> {
@@ -21,11 +20,11 @@ public class BookingDatesValidator implements ConstraintValidator<BookingDatesVa
     public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
         Object checkInDate = new BeanWrapperImpl(object).getPropertyValue(checkIn);
         Object checkOutDate = new BeanWrapperImpl(object).getPropertyValue(checkOut);
-        if(checkInDate == null) {
+        if (checkInDate == null) {
             return true;
         }
 
-        if(checkOutDate == null) {
+        if (checkOutDate == null) {
             return true;
         }
 

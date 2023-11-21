@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void validateDates(LocalDate checkIn, LocalDate checkOut, Booking booking) {
-        if((checkIn != null && booking.getCheckOut().isBefore(checkIn))
+        if ((checkIn != null && booking.getCheckOut().isBefore(checkIn))
                 || (checkOut != null && booking.getCheckIn().isAfter(checkOut))
         ) {
             throw new BookingInvalidDateException(

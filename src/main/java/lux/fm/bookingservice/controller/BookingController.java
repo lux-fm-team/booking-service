@@ -85,7 +85,7 @@ public class BookingController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public void deleteBookById(@PathVariable @Positive  Long id) {
+    public void deleteBookById(@PathVariable @Positive Long id) {
         bookingService.deleteBookingById(id);
     }
 }

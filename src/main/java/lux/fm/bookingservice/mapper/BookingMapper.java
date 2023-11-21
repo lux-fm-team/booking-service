@@ -15,6 +15,6 @@ public interface BookingMapper {
     @Mapping(source = "booking.accommodation.id", target = "accommodationId")
     BookingResponseDto toDto(Booking booking);
 
-    @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(BookingRequestUpdateDto requestUpdateDto, @MappingTarget Booking booking);
 }
