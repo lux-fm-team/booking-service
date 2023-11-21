@@ -78,6 +78,10 @@ public class BookingController {
         return bookingService.findBookingById(authentication.getName(), id);
     }
 
+    @Operation(
+            summary = "Update booking by id",
+            description = "Update booking by id, user have to be authorized"
+    )
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('CUSTOMER')")
@@ -87,6 +91,10 @@ public class BookingController {
         return bookingService.updateBookingById(requestUpdateDto, id);
     }
 
+    @Operation(
+            summary = "Delete booking by id",
+            description = "Delete booking by id, user have to be authorized"
+    )
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('CUSTOMER')")
     public void deleteBookById(@PathVariable @Positive Long id) {

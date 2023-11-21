@@ -18,12 +18,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "bookings")
+@SQLDelete(sql = "UPDATE bookings SET status='CANCELED' where id = ?")
 @Where(clause = "status != 'CANCELED'")
 public class Booking {
     @Id

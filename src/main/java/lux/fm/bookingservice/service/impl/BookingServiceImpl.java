@@ -1,5 +1,6 @@
 package lux.fm.bookingservice.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -64,30 +65,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("User with such id doesn't exist: " + id)
         );
-        booking.setStatus(Status.CANCELED);
-        bookingRepository.save(booking);
-        Booking booking = bookingRepository.findBookingByUserEmailAndId(username, id).orElseThrow(
-                () -> new EntityNotFoundException("There's no booking with id: " + id)
-        );
-        return bookingMapper.toDto(booking);
-    }
-
-    @Override
-    public BookingResponseDto updateBookingById(BookingRequestUpdateDto requestUpdateDto, Long id) {
-        Booking booking = bookingRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("User with such id doesn't exist: " + id)
-        );
-        bookingMapper.update(requestUpdateDto, booking);
-        return bookingMapper.toDto(bookingRepository.save(booking));
-    }
-
-    @Override
-    public void deleteBookingById(Long id) {
-        Booking booking = bookingRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("User with such id doesn't exist: " + id)
-        );
-        booking.setStatus(Status.CANCELED);
-        bookingRepository.save(booking);
+        bookingRepository.delete(booking);
     }
 
     @Override
