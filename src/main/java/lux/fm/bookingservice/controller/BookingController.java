@@ -2,6 +2,7 @@ package lux.fm.bookingservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -72,9 +73,13 @@ public class BookingController {
         return bookingService.findBookingById(authentication.getName(), id);
     }
 
+    @Operation(
+            summary = "Create a new booking",
+            description = "Creates a new booking"
+    )
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
-    public BookingResponseDto addBooking(@RequestBody BookingRequestDto request) {
+    public BookingResponseDto addBooking(@RequestBody @Valid BookingRequestDto request) {
         return bookingService.addBooking(request);
     }
 }

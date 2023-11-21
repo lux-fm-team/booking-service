@@ -55,6 +55,12 @@ public class GlobalExceptionHandler {
         return new ErrorResponseWrapper(LocalDateTime.now(), "entity-not-found", ex.getMessage());
     }
 
+    @ExceptionHandler(BookingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ErrorResponseWrapper handleBookingException(BookingException ex) {
+        return new ErrorResponseWrapper(LocalDateTime.now() , "bad-request" , ex.getMessage());
+    }
+
     private String getErrorMessage(ObjectError e) {
         if (e instanceof FieldError) {
             String field = ((FieldError) e).getField();
