@@ -30,6 +30,7 @@ public class Payment {
 
     @OneToOne
     @JoinColumn(name = "booking_id")
+    @Column(nullable = false)
     private Booking booking;
 
     @Column(nullable = false)
