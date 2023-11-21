@@ -15,11 +15,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "bookings")
+@Where(clause = "status != 'CANCELED'")
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

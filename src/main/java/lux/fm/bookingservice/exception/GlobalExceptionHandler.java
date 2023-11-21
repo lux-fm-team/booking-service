@@ -55,6 +55,14 @@ public class GlobalExceptionHandler {
         return new ErrorResponseWrapper(LocalDateTime.now(), "entity-not-found", ex.getMessage());
     }
 
+    @ExceptionHandler(BookingInvalidDateException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    protected ErrorResponseWrapper handleBookingInvalidDateException(
+            BookingInvalidDateException ex) {
+        return new ErrorResponseWrapper(LocalDateTime.now(), "booking-invalid-date",
+                ex.getMessage());
+    }
+
     private String getErrorMessage(ObjectError e) {
         if (e instanceof FieldError) {
             String field = ((FieldError) e).getField();

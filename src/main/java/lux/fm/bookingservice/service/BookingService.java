@@ -12,6 +12,8 @@ public interface BookingService {
 
     BookingResponseDto findBookingById(String token, Long id);
 
-    BookingResponseDto updateBookById(BookingRequestUpdateDto requestUpdateDto, Long id);
+    BookingResponseDto updateBookingById(BookingRequestUpdateDto requestUpdateDto, Long id);
+
+    void deleteBookingById(Long id);
 }
 
