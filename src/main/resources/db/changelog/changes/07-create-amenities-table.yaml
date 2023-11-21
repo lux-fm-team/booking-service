@@ -12,7 +12,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     foreignKeyName: fk_accommodation_amenities
-                    references: accommodation(id)
+                    references: accommodations(id)
               - column:
                   name: amenity
                   type: varchar(255)
