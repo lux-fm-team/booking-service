@@ -1,49 +1,72 @@
 package lux.fm.bookingservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.model.Status;
 import lux.fm.bookingservice.service.BookingService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Booking management",
+        description = "Endpoints for bookings")
 @RestController
 @RequestMapping("/bookings")
 @RequiredArgsConstructor
+@Validated
 public class BookingController {
     private final BookingService bookingService;
 
-    @GetMapping("/my")
+    @Operation(
+            summary = "Get all bookings with filters",
+            description = "Get all bookings by its user_id and status, available for admin only"
+    )
+    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookingResponseDto> getBookingsByUserIdAndStatus(
+            @RequestParam @Positive Long id,
+            @RequestParam Status status
+    ) {
+        return bookingService.findBookingsByUserIdAndStatus(id, status);
+    }
+
+    @Operation(
+            summary = "Get user bookings",
+            description = "Get all bookings for authorized user"
+    )
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @ResponseStatus(HttpStatus.OK)
     public List<BookingResponseDto> getMyBookings(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token
     ) {
         return bookingService.findMyBookings(token);
     }
 
-    @GetMapping
-    @PreAuthorize("hasRole('CUSTOMER')")
-    public List<BookingResponseDto> getBookingsByUserIdAndStatus(
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token,
-            @RequestParam Long id,
-            @RequestParam Status status
-            ) {
-        return bookingService.findBookingsByUserIdAndStatus(token, id, status);
-    }
-
+    @Operation(
+            summary = "Find booking by id",
+            description = "Find booking by id, user have to be authorized"
+    )
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @ResponseStatus(HttpStatus.OK)
     public BookingResponseDto findBookingById(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable Long id
+            @PathVariable @Positive Long id
     ) {
-        return null;
+        return bookingService.findBookingById(token, id);
     }
 }
