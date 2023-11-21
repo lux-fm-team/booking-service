@@ -66,16 +66,28 @@ public class BookingServiceImpl implements BookingService {
         );
         booking.setStatus(Status.CANCELED);
         bookingRepository.save(booking);
-    }
+        Booking booking = bookingRepository.findBookingByUserEmailAndId(username, id).orElseThrow(
+                () -> new EntityNotFoundException("There's no booking with id: " + id)
+        );
+        return bookingMapper.toDto(booking);
     }
 
     @Override
-    public BookingResponseDto updateBookById(BookingRequestUpdateDto requestUpdateDto, Long id) {
+    public BookingResponseDto updateBookingById(BookingRequestUpdateDto requestUpdateDto, Long id) {
         Booking booking = bookingRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("User with such id doesn't exist: " + id)
         );
         bookingMapper.update(requestUpdateDto, booking);
-        return bookingMapper.toDto(booking);
+        return bookingMapper.toDto(bookingRepository.save(booking));
+    }
+
+    @Override
+    public void deleteBookingById(Long id) {
+        Booking booking = bookingRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("User with such id doesn't exist: " + id)
+        );
+        booking.setStatus(Status.CANCELED);
+        bookingRepository.save(booking);
     }
 
     @Override
@@ -94,8 +106,7 @@ public class BookingServiceImpl implements BookingService {
 
     private User getCurrentlyAuthenticatedUser() {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(name)
-                .get();
+        return userRepository.findByEmail(name).get();
     }
 
     private Accommodation getAccommodation(Long id) {

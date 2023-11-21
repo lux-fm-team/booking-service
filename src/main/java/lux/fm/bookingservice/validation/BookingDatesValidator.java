@@ -20,14 +20,6 @@ public class BookingDatesValidator implements ConstraintValidator<BookingDatesVa
     public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
         Object checkInDate = new BeanWrapperImpl(object).getPropertyValue(checkIn);
         Object checkOutDate = new BeanWrapperImpl(object).getPropertyValue(checkOut);
-        if (checkInDate == null) {
-            return true;
-        }
-
-        if (checkOutDate == null) {
-            return true;
-        }
-
         return ((LocalDate) checkInDate).isBefore((LocalDate) checkOutDate);
     }
 }
