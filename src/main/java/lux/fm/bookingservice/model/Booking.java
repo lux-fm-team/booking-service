@@ -2,12 +2,15 @@ package lux.fm.bookingservice.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.Getter;
@@ -16,6 +19,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@Table(name = "bookings")
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,16 +30,17 @@ public class Booking {
     private User user;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation;
 
-    @Column(name = "check_in", nullable = false)
+    @Column(name = "check_in")
     private LocalDate checkIn;
 
-    @Column(name = "check_out", nullable = false)
+    @Column(name = "check_out")
     private LocalDate checkOut;
 
     @Column(name = "life_time", nullable = false)

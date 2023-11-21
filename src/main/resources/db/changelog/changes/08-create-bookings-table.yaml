@@ -21,8 +21,15 @@ databaseChangeLog:
                     references: users(id)
                     nullable: false
               - column:
+                  name: accommodation_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_bookings-accommodation
+                    references: accommodations(id)
+                    nullable: false
+              - column:
                   name: status
-                  type: varchar
+                  type: varchar(255)
                   constraints:
                     nullable: false
               - column:
