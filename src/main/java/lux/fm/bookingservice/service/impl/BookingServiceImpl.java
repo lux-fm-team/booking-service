@@ -1,11 +1,9 @@
 package lux.fm.bookingservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDate;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lux.fm.bookingservice.dto.booking.BookingRequestDto;
+import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.exception.BookingException;
@@ -69,50 +67,38 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResponseDto addBooking(BookingRequestDto request) {
+    public BookingResponseDto addBooking(BookingRequestCreateDto request) {
         validate(request);
-
         User user = getCurrentlyAuthenticatedUser();
-        Booking booking = new Booking();
-        booking.setUser(user);
-        booking.setAccommodation(getAccommodation(request.accommodationId()));
-        booking.setCheckIn(request.checkIn());
-        booking.setCheckOut(request.checkOut());
-        booking.setStatus(Status.PENDING);
+        Booking booking = bookingMapper.toModel(request, user);
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
 
     private User getCurrentlyAuthenticatedUser() {
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(name).get();
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(username).get();
     }
 
     private Accommodation getAccommodation(Long id) {
         return accommodationRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("No such accommodation")
+                () -> new EntityNotFoundException("Such accommodation doesn't exist with id: " + id)
         );
     }
 
-    private void validate(BookingRequestDto request) {
-
-        LocalDate today = LocalDate.now();
-
-        if (request.checkIn().isBefore(today) || request.checkIn().isAfter(request.checkOut())) {
-            throw new BookingException("Bad date request");
-        }
-
+    private void validate(BookingRequestCreateDto request) {
         Accommodation accommodation = accommodationRepository.findById(request.accommodationId())
-                .orElseThrow(() -> new EntityNotFoundException("No such accommodation")
-                );
-
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Accommodation doesn't exist with id: " + request.accommodationId()
+                ));
         Long count = bookingRepository.countBookingsInDate(
                 accommodation.getId(),
                 request.checkIn(),
                 request.checkOut()
         );
-
         if (count >= accommodation.getAvailability()) {
-            throw new BookingException("Not available accommodation");
+            throw new BookingException(
+                    "The accommodation isn't available with id: " + request.accommodationId()
+            );
         }
     }
 }

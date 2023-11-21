@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
+import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -96,6 +96,7 @@ public class BookingController {
             description = "Delete booking by id, user have to be authorized"
     )
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('CUSTOMER')")
     public void deleteBookById(@PathVariable @Positive Long id) {
         bookingService.deleteBookingById(id);
@@ -106,23 +107,9 @@ public class BookingController {
             description = "Creates a new booking"
     )
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('CUSTOMER')")
-    public BookingResponseDto addBooking(@RequestBody @Valid BookingRequestDto request) {
+    public BookingResponseDto addBooking(@RequestBody @Valid BookingRequestCreateDto request) {
         return bookingService.addBooking(request);
-    }
-
-    @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('CUSTOMER')")
-    public BookingResponseDto updateBookingById(
-            @RequestBody @Valid BookingRequestUpdateDto requestUpdateDto,
-            @PathVariable @Positive Long id) {
-        return bookingService.updateBookingById(requestUpdateDto, id);
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('CUSTOMER')")
-    public void deleteBookById(@PathVariable @Positive Long id) {
-        bookingService.deleteBookingById(id);
     }
 }

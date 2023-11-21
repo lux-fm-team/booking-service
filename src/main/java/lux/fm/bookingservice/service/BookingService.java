@@ -1,7 +1,7 @@
 package lux.fm.bookingservice.service;
 
 import java.util.List;
-import lux.fm.bookingservice.dto.booking.BookingRequestDto;
+import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.model.Status;
@@ -18,9 +18,5 @@ public interface BookingService {
     void deleteBookingById(Long id);
 
     BookingResponseDto addBooking(BookingRequestDto request);
-
-    BookingResponseDto updateBookingById(BookingRequestUpdateDto requestUpdateDto, Long id);
-
-    void deleteBookingById(Long id);
 }
 
