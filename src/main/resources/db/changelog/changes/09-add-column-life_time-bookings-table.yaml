@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id:
+      author: a.parashchuk
+      changes:
+        - addColumn:
+            tableName: bookings
+            columns:
+              - column:
+                  name: life_time
+                  type: time
+                  constraints:
+                    nullable: false
