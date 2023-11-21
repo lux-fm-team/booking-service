@@ -24,11 +24,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     foreignKeyName: fk_payment_booking
-<<<<<<< HEAD
                     references: bookings(id)
-=======
-                    references: booking(id)
->>>>>>> 28403be85fa6d935464f4c506636f457d2997a97
               - column:
                   name: session_url
                   type: varchar(1024)
