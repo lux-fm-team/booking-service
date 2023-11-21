@@ -137,5 +137,4 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingException("Not available accommodation");
         }
     }
-
 }
