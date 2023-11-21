@@ -13,10 +13,9 @@ import lux.fm.bookingservice.exception.EntityNotFoundException;
 import lux.fm.bookingservice.exception.RegistrationException;
 import lux.fm.bookingservice.mapper.UserMapper;
 import lux.fm.bookingservice.model.Role;
-import lux.fm.bookingservice.model.RoleName;
 import lux.fm.bookingservice.model.User;
-import lux.fm.bookingservice.repository.role.RoleRepository;
-import lux.fm.bookingservice.repository.user.UserRepository;
+import lux.fm.bookingservice.repository.RoleRepository;
+import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,7 +41,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRoles(new HashSet<>(Arrays.asList(
-                roleRepository.findRoleByName(RoleName.ROLE_CUSTOMER)
+                roleRepository.findRoleByName(Role.RoleName.ROLE_CUSTOMER)
         )));
         userRepository.save(user);
         return userMapper.toDto(user);

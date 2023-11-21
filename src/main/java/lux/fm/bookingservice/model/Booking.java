@@ -49,9 +49,16 @@ public class Booking {
     @Column(name = "check_out", nullable = false)
     private LocalDate checkOut;
 
-    @Column(name = "life_time", nullable = false)
-    private LocalTime lifeTime = LocalTime.now().plusMinutes(20);
+    @Column(name = "time_to_live", nullable = false)
+    private LocalTime timeToLive = LocalTime.now().plusMinutes(20);
 
     @OneToOne(mappedBy = "booking", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Payment payment;
+
+    public enum Status {
+        PENDING,
+        CONFIRMED,
+        CANCELED,
+        EXPIRED
+    }
 }

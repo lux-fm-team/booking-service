@@ -2,11 +2,11 @@ package lux.fm.bookingservice.dto.accommodation;
 
 import java.math.BigDecimal;
 import java.util.List;
-import lux.fm.bookingservice.model.AccommodationType;
+import lux.fm.bookingservice.model.Accommodation;
 
 public record AccommodationDto(
         Long id,
-        AccommodationType type,
+        Accommodation.AccommodationType type,
         String location,
         String size,
         List<String> amenities,

@@ -5,11 +5,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.List;
-import lux.fm.bookingservice.model.AccommodationType;
+import lux.fm.bookingservice.model.Accommodation;
 
 public record CreateAccommodationRequestDto(
         @NotNull
-        AccommodationType type,
+        Accommodation.AccommodationType type,
         @NotBlank
         String location,
         @NotBlank

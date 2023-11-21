@@ -1,0 +1,10 @@
+databaseChangeLog:
+  -  changeSet:
+       id:  rename-column-for-live-time-column-in-bookings
+       author: Maksym
+       changes:
+         -  renameColumn:
+              columnDataType: time
+              newColumnName:  time_to_live
+              oldColumnName:  life_time
+              tableName:  bookings

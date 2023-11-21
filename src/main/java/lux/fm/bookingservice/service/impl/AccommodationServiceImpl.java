@@ -7,7 +7,7 @@ import lux.fm.bookingservice.dto.accommodation.AccommodationDto;
 import lux.fm.bookingservice.dto.accommodation.CreateAccommodationRequestDto;
 import lux.fm.bookingservice.mapper.AccommodationMapper;
 import lux.fm.bookingservice.model.Accommodation;
-import lux.fm.bookingservice.repository.accommodation.AccommodationRepository;
+import lux.fm.bookingservice.repository.AccommodationRepository;
 import lux.fm.bookingservice.service.AccommodationService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

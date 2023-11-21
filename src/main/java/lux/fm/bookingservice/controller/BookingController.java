@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
-import lux.fm.bookingservice.model.Status;
+import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.service.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,7 +44,7 @@ public class BookingController {
     @ResponseStatus(HttpStatus.OK)
     public List<BookingResponseDto> getBookingsByUserIdAndStatus(
             @RequestParam @Positive Long id,
-            @RequestParam Status status
+            @RequestParam Booking.Status status
     ) {
         return bookingService.findBookingsByUserIdAndStatus(id, status);
     }
@@ -100,7 +100,7 @@ public class BookingController {
     public void deleteBookById(
             Authentication authentication,
             @PathVariable @Positive Long id) {
-        bookingService.deleteBookingById(authentication.getName(), id);
+        bookingService.deleteBookingById(authentication, id);
     }
 
     @Operation(

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lux.fm.bookingservice.dto.user.UserLoginRequestDto;
 import lux.fm.bookingservice.exception.NotificationException;
-import lux.fm.bookingservice.repository.user.UserRepository;
+import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.security.AuthenticationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -77,7 +77,9 @@ public class Bot extends TelegramLongPollingBot {
                         UserLoginRequestDto requestDto =
                                 new UserLoginRequestDto(params.get(0), params.get(1));
                         try {
-                            authenticationService.authenticate(requestDto);
+                            authenticationService.authenticateWithTelegram(
+                                    requestDto, Long.valueOf(chatId)
+                            );
                             sendMessage.setText("Success!");
                             sendMessage.setChatId(chatId);
                         } catch (BadCredentialsException e) {
@@ -116,7 +118,7 @@ public class Bot extends TelegramLongPollingBot {
 
     public void sendMessageToUser(String text, Long id) {
         try {
-            execute(new SendMessage(text, id.toString()));
+            execute(new SendMessage(id.toString(), text));
         } catch (TelegramApiException e) {
             throw new NotificationException("Can't send message to user with id " + id);
         }
