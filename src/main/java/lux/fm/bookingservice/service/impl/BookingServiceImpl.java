@@ -37,6 +37,8 @@ public class BookingServiceImpl implements BookingService {
             Authentication authentication,
             BookingRequestCreateDto request
     ) {
+        validateExistingBookings(authentication);
+
         Accommodation accommodation = getAccommodation(request.accommodationId());
         User user = (User) authentication.getPrincipal();
 
@@ -81,9 +83,9 @@ public class BookingServiceImpl implements BookingService {
             String username, BookingRequestUpdateDto requestUpdateDto, Long id) {
         Booking booking = bookingRepository.findBookingByUserEmailAndId(username, id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Booking with such id doesn't exist: " + id
-                )
-        );
+                                "Booking with such id doesn't exist: " + id
+                        )
+                );
         validateAvailablePlaces(
                 booking.getAccommodation(),
                 requestUpdateDto.checkIn(),
@@ -96,11 +98,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public void deleteBookingById(Authentication authentication, Long id) {
         Booking booking = bookingRepository.findBookingByUserEmailAndId(
-                authentication.getName(), id)
+                        authentication.getName(), id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Booking with such id doesn't exist: " + id
-                )
-        );
+                                "Booking with such id doesn't exist: " + id
+                        )
+                );
         User user = (User) authentication.getPrincipal();
 
         if (user.getTelegramId() != null) {
@@ -129,6 +131,14 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingException(
                     "The accommodation isn't available with id: " + accommodation.getId()
             );
+        }
+    }
+
+    private void validateExistingBookings(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        Boolean bookings = bookingRepository.existsBookingByUserAndStatus(user, Status.PENDING);
+        if (bookings) {
+            throw new BookingException("You have a booking with status PENDING");
         }
     }
 }
