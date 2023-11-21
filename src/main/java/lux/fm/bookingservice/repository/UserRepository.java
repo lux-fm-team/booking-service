@@ -1,4 +1,4 @@
-package lux.fm.bookingservice.repository.user;
+package lux.fm.bookingservice.repository;
 
 import java.util.Optional;
 import lux.fm.bookingservice.model.User;

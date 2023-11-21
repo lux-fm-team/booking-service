@@ -1,6 +1,7 @@
 package lux.fm.bookingservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -11,15 +12,14 @@ import lux.fm.bookingservice.exception.BookingException;
 import lux.fm.bookingservice.mapper.BookingMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
-import lux.fm.bookingservice.model.Status;
+import lux.fm.bookingservice.model.Booking.Status;
 import lux.fm.bookingservice.model.User;
-import lux.fm.bookingservice.repository.accommodation.AccommodationRepository;
-import lux.fm.bookingservice.repository.booking.BookingRepository;
-import lux.fm.bookingservice.repository.user.UserRepository;
+import lux.fm.bookingservice.repository.AccommodationRepository;
+import lux.fm.bookingservice.repository.BookingRepository;
+import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,18 +32,22 @@ public class BookingServiceImpl implements BookingService {
     private final NotificationService notificationService;
 
     @Override
+    @Transactional
     public BookingResponseDto addBooking(
             Authentication authentication,
             BookingRequestCreateDto request
     ) {
-        validateAvailablePlaces(request.accommodationId(), request.checkIn(), request.checkOut());
         Accommodation accommodation = getAccommodation(request.accommodationId());
+        User user = (User) authentication.getPrincipal();
+
+        validateAvailablePlaces(accommodation, request.checkIn(), request.checkOut());
+
         Booking booking = bookingMapper.toModel(request);
-        booking.setUser((User) authentication.getPrincipal());
+        booking.setUser(user);
         booking.setAccommodation(accommodation);
-        User user = getCurrentlyAuthenticatedUser();
+
         if (user.getTelegramId() != null) {
-            String message = "Booking was deleted: " + bookingMapper.toDto(booking).toString();
+            String message = "Booking was created: " + bookingMapper.toDto(booking).toString();
             notificationService.notifyUser(user.getTelegramId(), message);
         }
         return bookingMapper.toDto(bookingRepository.save(booking));
@@ -71,6 +75,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toDto(booking);
     }
 
+    @Transactional
     @Override
     public BookingResponseDto updateBookingById(
             String username, BookingRequestUpdateDto requestUpdateDto, Long id) {
@@ -80,7 +85,7 @@ public class BookingServiceImpl implements BookingService {
                 )
         );
         validateAvailablePlaces(
-                booking.getAccommodation().getId(),
+                booking.getAccommodation(),
                 requestUpdateDto.checkIn(),
                 requestUpdateDto.checkOut()
         );
@@ -89,23 +94,21 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void deleteBookingById(String username, Long id) {
-        Booking booking = bookingRepository.findBookingByUserEmailAndId(username, id)
+    public void deleteBookingById(Authentication authentication, Long id) {
+        Booking booking = bookingRepository.findBookingByUserEmailAndId(
+                authentication.getName(), id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Booking with such id doesn't exist: " + id
                 )
         );
-        User user = getCurrentlyAuthenticatedUser();
+        User user = (User) authentication.getPrincipal();
+
         if (user.getTelegramId() != null) {
             String message = "Booking was deleted: " + bookingMapper.toDto(booking).toString();
             notificationService.notifyUser(user.getTelegramId(), message);
         }
-        bookingRepository.delete(booking);
-    }
 
-    private User getCurrentlyAuthenticatedUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(username).get();
+        bookingRepository.delete(booking);
     }
 
     private Accommodation getAccommodation(Long id) {
@@ -115,20 +118,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void validateAvailablePlaces(
-            Long accommodationId,
+            Accommodation accommodation,
             LocalDate checkInDate,
             LocalDate checkOutDate
     ) {
-        Accommodation accommodation = accommodationRepository.findById(accommodationId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Accommodation doesn't exist with id: " + accommodationId
-                ));
-        Long count = bookingRepository.countBookingsInDate(
+        Long count = bookingRepository.countBookingsInDateRange(
                 accommodation.getId(), checkInDate, checkOutDate
         );
         if (count >= accommodation.getAvailability()) {
             throw new BookingException(
-                    "The accommodation isn't available with id: " + accommodationId
+                    "The accommodation isn't available with id: " + accommodation.getId()
             );
         }
     }

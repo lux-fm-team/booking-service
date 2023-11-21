@@ -1,7 +1,7 @@
 package lux.fm.bookingservice.security;
 
 import lombok.RequiredArgsConstructor;
-import lux.fm.bookingservice.repository.user.UserRepository;
+import lux.fm.bookingservice.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -19,10 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
 @Entity
+@SQLDelete(sql = "UPDATE accommodations SET is_deleted = true where id = ?")
+@Where(clause = "is_deleted = false")
 @Table(name = "accommodations")
 public class Accommodation {
     @Id
@@ -54,4 +58,13 @@ public class Accommodation {
     @Column(nullable = false)
     private Integer availability;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
+    public enum AccommodationType {
+            HOUSE,
+            APARTMENT,
+            CONDO,
+            VACATION_HOME;
+    }
 }

@@ -19,3 +19,7 @@ databaseChangeLog:
       file: db/changelog/changes/09-add-column-life_time-bookings-table.yaml
   - include:
       file: db/changelog/changes/10-create-payment-table.yaml
+  - include:
+      file: db/changelog/changes/11-add-id-deleted-column-for-accommodations.yaml
+  - include:
+      file: db/changelog/changes/12-rename-life-time-column-in-bookings.yaml

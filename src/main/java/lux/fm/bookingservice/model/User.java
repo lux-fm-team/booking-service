@@ -57,7 +57,7 @@ public class User implements UserDetails {
     private Set<Role> roles = new HashSet<>();
 
     @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
+    private boolean isDeleted = false;
     @Column(name = "telegram_id")
     private Long telegramId;
 
