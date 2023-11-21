@@ -5,7 +5,6 @@ import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.model.Booking;
-import lux.fm.bookingservice.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -15,7 +14,7 @@ public interface BookingMapper {
     @Mapping(source = "booking.accommodation.id", target = "accommodationId")
     BookingResponseDto toDto(Booking booking);
 
-    Booking toModel(BookingRequestCreateDto requestCreateDto, User user);
+    Booking toModel(BookingRequestCreateDto requestCreateDto);
 
     void update(BookingRequestUpdateDto requestUpdateDto, @MappingTarget Booking booking);
 }
