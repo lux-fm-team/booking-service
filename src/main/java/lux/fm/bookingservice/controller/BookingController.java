@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,6 +76,14 @@ public class BookingController {
             @PathVariable @Positive Long id
     ) {
         return bookingService.findBookingById(authentication.getName(), id);
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public BookingResponseDto updateBookingById(
+            @RequestBody BookingRequestUpdateDto requestUpdateDto,
+            @PathVariable Long id) {
+        return null;
     }
 
     @Operation(

@@ -8,7 +8,6 @@ import lux.fm.bookingservice.dto.booking.BookingRequestDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.exception.BookingException;
-import lux.fm.bookingservice.exception.EntityNotFoundException;
 import lux.fm.bookingservice.mapper.BookingMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
@@ -31,8 +30,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingResponseDto> findBookingsByUserIdAndStatus(Long userId, Status status) {
-        return bookingRepository.findByUserIdAndStatus(userId, status)
-                .stream().map(bookingMapper::toDto)
+        return bookingRepository.findByUserIdAndStatus(userId, status).stream()
+                .map(bookingMapper::toDto)
                 .toList();
     }
 
@@ -68,6 +67,15 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(Status.CANCELED);
         bookingRepository.save(booking);
     }
+    }
+
+    @Override
+    public BookingResponseDto updateBookById(BookingRequestUpdateDto requestUpdateDto, Long id) {
+        Booking booking = bookingRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("User with such id doesn't exist: " + id)
+        );
+        bookingMapper.update(requestUpdateDto, booking);
+        return bookingMapper.toDto(booking);
     }
 
     @Override
