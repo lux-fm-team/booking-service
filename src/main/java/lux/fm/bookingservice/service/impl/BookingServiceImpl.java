@@ -15,8 +15,11 @@ import lux.fm.bookingservice.model.Status;
 import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.accommodation.AccommodationRepository;
 import lux.fm.bookingservice.repository.booking.BookingRepository;
+import lux.fm.bookingservice.repository.user.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
+import lux.fm.bookingservice.service.NotificationService;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +28,8 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
+    private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Override
     public BookingResponseDto addBooking(
@@ -36,6 +41,11 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingMapper.toModel(request);
         booking.setUser((User) authentication.getPrincipal());
         booking.setAccommodation(accommodation);
+        User user = getCurrentlyAuthenticatedUser();
+        if (user.getTelegramId() != null) {
+            String message = "Booking was deleted: " + bookingMapper.toDto(booking).toString();
+            notificationService.notifyUser(user.getTelegramId(), message);
+        }
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
 
@@ -85,7 +95,17 @@ public class BookingServiceImpl implements BookingService {
                         "Booking with such id doesn't exist: " + id
                 )
         );
+        User user = getCurrentlyAuthenticatedUser();
+        if (user.getTelegramId() != null) {
+            String message = "Booking was deleted: " + bookingMapper.toDto(booking).toString();
+            notificationService.notifyUser(user.getTelegramId(), message);
+        }
         bookingRepository.delete(booking);
+    }
+
+    private User getCurrentlyAuthenticatedUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(username).get();
     }
 
     private Accommodation getAccommodation(Long id) {

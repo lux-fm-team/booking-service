@@ -1,5 +1,6 @@
 package lux.fm.bookingservice.notifications;
 
+import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -13,12 +14,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @Component
 @Getter
@@ -27,12 +30,22 @@ public class Bot extends TelegramLongPollingBot {
     @Value("${bot.username}")
     private String botUsername;
     @Value("${bot.token}")
-    private String botToken = "";
+    private String botToken;
     @Setter
     private String currentCommand = "";
     private final UserRepository userRepository;
     private final List<String> params = new ArrayList<>();
     private final AuthenticationService authenticationService;
+
+    @PostConstruct
+    private void init() {
+        try {
+            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+            botsApi.registerBot(this);
+        } catch (TelegramApiException e) {
+            throw new NotificationException("Can't start telegram bot", e);
+        }
+    }
 
     //TODO: refactor code
     @Override
