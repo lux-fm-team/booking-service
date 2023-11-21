@@ -39,5 +39,5 @@ public class Booking {
     private LocalDate checkOut;
 
     @Column(name = "life_time", nullable = false)
-    private LocalTime lifeTime = LocalTime.of(23, 59).plusMinutes(20);
+    private LocalTime lifeTime = LocalTime.now().plusMinutes(20);
 }
