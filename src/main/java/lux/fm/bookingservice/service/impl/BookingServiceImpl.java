@@ -18,9 +18,7 @@ import lux.fm.bookingservice.repository.accommodation.AccommodationRepository;
 import lux.fm.bookingservice.repository.booking.BookingRepository;
 import lux.fm.bookingservice.repository.user.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
