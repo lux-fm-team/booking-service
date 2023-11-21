@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,4 +42,7 @@ public class Booking {
 
     @Column(name = "check_out")
     private LocalDate checkOut;
+
+    @Column(name = "life_time", nullable = false)
+    private LocalTime lifeTime = LocalTime.now().plusMinutes(20);
 }
