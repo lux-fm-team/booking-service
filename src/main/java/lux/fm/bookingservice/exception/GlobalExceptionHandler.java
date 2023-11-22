@@ -55,9 +55,9 @@ public class GlobalExceptionHandler {
         return new ErrorResponseWrapper(LocalDateTime.now(), "entity-not-found", ex.getMessage());
     }
 
-    @ExceptionHandler(BookingException.class)
+    @ExceptionHandler({BookingException.class, PaymentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ErrorResponseWrapper handleBookingException(BookingException ex) {
+    protected ErrorResponseWrapper handleBookingException(RuntimeException ex) {
         return new ErrorResponseWrapper(LocalDateTime.now(), "bad-request", ex.getMessage());
     }
 

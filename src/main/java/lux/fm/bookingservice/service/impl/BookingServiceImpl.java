@@ -72,7 +72,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponseDto findBookingById(String username, Long id) {
-        Booking booking = bookingRepository.findBookingByUserEmailAndId(username, id).orElseThrow(
+        Booking booking = bookingRepository.findByUserEmailAndId(username, id).orElseThrow(
                 () -> new EntityNotFoundException("There's no booking with id: " + id)
         );
         return bookingMapper.toDto(booking);
@@ -82,7 +82,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto updateBookingById(
             String username, BookingRequestUpdateDto requestUpdateDto, Long id) {
-        Booking booking = bookingRepository.findBookingByUserEmailAndId(username, id)
+        Booking booking = bookingRepository.findByUserEmailAndId(username, id)
                 .orElseThrow(() -> new EntityNotFoundException(
                                 "Booking with such id doesn't exist: " + id
                         )
@@ -97,8 +97,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public void deleteBookingById(Authentication authentication, Long id) {
-        Booking booking = bookingRepository.findBookingByUserEmailAndId(
+        Booking booking = bookingRepository.findByUserEmailAndId(
                         authentication.getName(), id)
                 .orElseThrow(() -> new EntityNotFoundException(
                                 "Booking with such id doesn't exist: " + id
