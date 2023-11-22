@@ -16,6 +16,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByUserIdAndStatus(Long userId, Booking.Status stats);
 
+    List<Booking> findByStatus(Booking.Status stats);
+
     @Query("SELECT COUNT(b) from Booking as b where b.accommodation.id = :accommodationId "
             + "AND ((b.checkIn between :checkIn and :checkOut) "
             + "OR (b.checkOut between :checkIn and :checkOut))")
