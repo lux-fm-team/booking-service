@@ -1,5 +1,6 @@
 package lux.fm.bookingservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
 
+    @Operation(
+            summary = "Get your profile info",
+            description = "Retrieves general information about your profile."
+    )
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('CUSTOMER')")
@@ -34,6 +39,10 @@ public class UserController {
         return userService.getCurrentUserProfile();
     }
 
+    @Operation(
+            summary = "Update your profile info",
+            description = "Updates general information about your profile."
+    )
     @RequestMapping(value = "/me", method = {RequestMethod.PUT, RequestMethod.PATCH})
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('CUSTOMER')")
@@ -41,6 +50,10 @@ public class UserController {
         return userService.updateCurrentUserProfile(requestDto);
     }
 
+    @Operation(
+            summary = "Update user roles",
+            description = "Updates certain user's roles by user id."
+    )
     @PutMapping("/{id}/role")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")

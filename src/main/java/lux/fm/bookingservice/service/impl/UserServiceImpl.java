@@ -1,5 +1,6 @@
 package lux.fm.bookingservice.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +10,6 @@ import lux.fm.bookingservice.dto.user.UpdateUserRolesRequestDto;
 import lux.fm.bookingservice.dto.user.UserRegistrationRequestDto;
 import lux.fm.bookingservice.dto.user.UserResponseDto;
 import lux.fm.bookingservice.dto.user.UserResponseDtoWithRoles;
-import lux.fm.bookingservice.exception.EntityNotFoundException;
 import lux.fm.bookingservice.exception.RegistrationException;
 import lux.fm.bookingservice.mapper.UserMapper;
 import lux.fm.bookingservice.model.Role;

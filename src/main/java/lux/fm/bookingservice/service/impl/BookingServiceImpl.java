@@ -3,7 +3,6 @@ package lux.fm.bookingservice.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
@@ -21,14 +20,12 @@ import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    private static final int THREE_MINUTES_IN_MS = 180000;
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
@@ -121,13 +118,6 @@ public class BookingServiceImpl implements BookingService {
         }
 
         bookingRepository.delete(booking);
-    }
-
-    @Scheduled(fixedRate = THREE_MINUTES_IN_MS)
-    public void checkBookingLifeTime() {
-        bookingRepository.deleteAll(
-                bookingRepository.findByStatusAndTimeToLiveBefore(Status.PENDING, LocalTime.now())
-        );
     }
 
     private Accommodation getAccommodation(Long id) {

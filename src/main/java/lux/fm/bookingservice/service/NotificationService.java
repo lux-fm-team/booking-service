@@ -6,4 +6,6 @@ import org.springframework.stereotype.Service;
 public interface NotificationService {
     void notifyUser(Long id, String message);
 
+    void notifyAllUsers(String message);
+
 }
