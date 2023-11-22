@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import lux.fm.bookingservice.dto.payment.PaymentSessionDto;
+import lux.fm.bookingservice.exception.PaymentException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -67,7 +68,7 @@ public class StripeService {
         try {
             return Session.create(params);
         } catch (StripeException ex) {
-            throw new RuntimeException("Cant create stripe session");
+            throw new PaymentException("Cant create stripe session");
         }
     }
 
