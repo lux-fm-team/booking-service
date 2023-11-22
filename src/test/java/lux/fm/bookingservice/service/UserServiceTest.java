@@ -1,7 +1,6 @@
 package lux.fm.bookingservice.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
@@ -55,7 +54,8 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(requestDto.email())).thenReturn(false);
         when(roleRepository.findRoleByName(Role.RoleName.ROLE_CUSTOMER)).thenReturn(role);
         when(passwordEncoder.encode(requestDto.password())).thenReturn("encoded123456");
-        when(userRepository.save(any())).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toUser(requestDto)).thenReturn(user);
 
         UserResponseDto responseDto = userService.register(requestDto);
 
