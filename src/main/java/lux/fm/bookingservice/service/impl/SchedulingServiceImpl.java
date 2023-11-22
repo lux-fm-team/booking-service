@@ -2,6 +2,7 @@ package lux.fm.bookingservice.service.impl;
 
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.model.Accommodation;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SchedulingServiceImpl implements SchedulingService {
+    private static final int THREE_MINUTES_IN_MS = 180000;
     private final BookingRepository bookingRepository;
     private final NotificationService notificationService;
 
@@ -50,5 +52,15 @@ public class SchedulingServiceImpl implements SchedulingService {
                                     );
                     notificationService.notifyAllUsers(message);
                 });
+    }
+
+    @Override
+    @Scheduled(fixedRate = THREE_MINUTES_IN_MS)
+    public void checkBookingLifeTime() {
+        bookingRepository.deleteAll(
+                bookingRepository.findByStatusAndTimeToLiveBefore(
+                        Booking.Status.PENDING, LocalTime.now()
+                )
+        );
     }
 }
