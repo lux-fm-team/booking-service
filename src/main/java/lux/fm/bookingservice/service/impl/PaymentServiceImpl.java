@@ -6,12 +6,15 @@ import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.dto.payment.CreatePaymentRequestDto;
 import lux.fm.bookingservice.dto.payment.PaymentResponseDto;
 import lux.fm.bookingservice.dto.payment.PaymentSessionDto;
+import lux.fm.bookingservice.dto.payment.PaymentWithoutSessionDto;
 import lux.fm.bookingservice.exception.PaymentException;
+import lux.fm.bookingservice.mapper.BookingMapper;
 import lux.fm.bookingservice.mapper.PaymentMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
@@ -19,6 +22,7 @@ import lux.fm.bookingservice.model.Payment;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.service.PaymentService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -29,6 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final PaymentMapper paymentMapper;
+    private final BookingMapper bookingMapper;
     private final StripeService stripeService;
 
     @Override
@@ -49,9 +54,9 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         if (paymentRepository.existsByBooking(booking)) {
-            throw new PaymentException(
-                    "You already have payment with booking id %d. Cancel it or pay"
-                            .formatted(booking.getId()));
+            throw new PaymentException("You already have payment with booking id %d"
+                            .formatted(booking.getId())
+            );
         }
 
         Accommodation accommodation = booking.getAccommodation();
@@ -75,17 +80,36 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public BookingResponseDto success(String sessionId) {
-        return null;
+    @Transactional
+    public PaymentWithoutSessionDto successPayment(String sessionId) {
+        Payment payment = paymentRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new PaymentException("Payment session not found"));
+        payment.setStatus(Payment.Status.PAID);
+
+        Booking booking = payment.getBooking();
+        booking.setStatus(Status.CONFIRMED);
+        return paymentMapper.toDtoWithoutSession(payment);
     }
 
     @Override
-    public PaymentResponseDto cancel(String sessionId) {
-        return null;
+    @Transactional
+    public BookingResponseDto cancelPayment(String sessionId) {
+        Payment payment = paymentRepository.findBySessionIdAndStatus(
+                sessionId, Payment.Status.PENDING)
+                .orElseThrow(() -> new PaymentException("Payment session not found"));
+        Booking booking = payment.getBooking();
+        // @Todo: invalidate Stripe session
+        paymentRepository.delete(payment);
+        return bookingMapper.toDto(booking);
     }
 
     @Override
-    public List<PaymentResponseDto> findByUser(Long userId) {
-        return null;
+    public List<PaymentWithoutSessionDto> findByUser(Long userId, Pageable pageable) {
+        return Optional.ofNullable(userId)
+                .map((id) -> paymentRepository.findByUser(id, pageable))
+                .orElseGet(() -> paymentRepository.findAll(pageable))
+                .stream()
+                .map(paymentMapper::toDtoWithoutSession)
+                .toList();
     }
 }

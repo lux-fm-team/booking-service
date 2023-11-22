@@ -3,6 +3,7 @@ package lux.fm.bookingservice.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class BookingController {
     @ResponseStatus(HttpStatus.OK)
     public List<BookingResponseDto> getBookingsByUserIdAndStatus(
             @RequestParam @Positive Long id,
-            @RequestParam Booking.Status status
+            @RequestParam @NotNull Booking.Status status
     ) {
         return bookingService.findBookingsByUserIdAndStatus(id, status);
     }
@@ -56,9 +57,7 @@ public class BookingController {
     @GetMapping("/my")
     @PreAuthorize("hasRole('CUSTOMER')")
     @ResponseStatus(HttpStatus.OK)
-    public List<BookingResponseDto> getMyBookings(
-            Authentication authentication
-    ) {
+    public List<BookingResponseDto> getMyBookings(Authentication authentication) {
         return bookingService.findUserBookings(authentication.getName());
     }
 
