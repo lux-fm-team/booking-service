@@ -23,3 +23,5 @@ databaseChangeLog:
       file: db/changelog/changes/11-add-id-deleted-column-for-accommodations.yaml
   - include:
       file: db/changelog/changes/12-rename-life-time-column-in-bookings.yaml
+  - include:
+      file: db/changelog/changes/13-add-manager-role-to-db.yaml
