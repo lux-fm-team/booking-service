@@ -2,9 +2,7 @@ package lux.fm.bookingservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
