@@ -40,7 +40,7 @@ public class BookingController {
             description = "Get all bookings by its user_id and status, available for admin only"
     )
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     @ResponseStatus(HttpStatus.OK)
     public List<BookingResponseDto> getBookingsByUserIdAndStatus(
             @RequestParam @Positive Long id,

@@ -69,7 +69,7 @@ public class AccommodationController {
 
     @Operation(summary = "Delete an accommodation", description = "Delete an accommodation by id")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     @DeleteMapping("/{id}")
     public void delete(@Positive @PathVariable Long id) {
         accommodationService.deleteById(id);
