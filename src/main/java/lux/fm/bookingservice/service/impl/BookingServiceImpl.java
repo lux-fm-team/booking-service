@@ -104,6 +104,11 @@ public class BookingServiceImpl implements BookingService {
                                 "Booking with such id doesn't exist: " + id
                         )
                 );
+
+        if (booking.getStatus() != Status.PENDING) {
+            throw new BookingException("Booking can't be deleted on this stage");
+        }
+
         User user = (User) authentication.getPrincipal();
 
         if (user.getTelegramId() != null) {
