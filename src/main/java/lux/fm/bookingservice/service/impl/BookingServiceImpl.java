@@ -19,6 +19,7 @@ import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.AccommodationRepository;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
+import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,6 +33,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
+    private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final PaymentRepository paymentRepository;
 
