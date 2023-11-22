@@ -88,7 +88,7 @@ public class BookingServiceImpl implements BookingService {
                                 "Booking with such id doesn't exist: " + id
                         )
                 );
-        if(booking.getPayment().getStatus().equals(Payment.Status.PENDING)) {
+        if (booking.getPayment().getStatus().equals(Payment.Status.PENDING)) {
             throw new BookingException(
                     "Can't update booking until payment is completed");
         }
