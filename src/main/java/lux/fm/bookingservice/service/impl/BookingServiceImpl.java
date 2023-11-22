@@ -137,7 +137,8 @@ public class BookingServiceImpl implements BookingService {
 
     private void validateExistingBookings(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        Boolean bookings = bookingRepository.existsBookingByUserAndPaymentStatus(user, Payment.Status.PENDING);
+        Boolean bookings = bookingRepository
+                .existsBookingByUserAndPaymentStatus(user, Payment.Status.PENDING);
         if (bookings) {
             throw new BookingException("You have a payment with status PENDING");
         }
