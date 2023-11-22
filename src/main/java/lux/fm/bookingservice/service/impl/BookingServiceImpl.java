@@ -17,7 +17,7 @@ import lux.fm.bookingservice.model.Payment;
 import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.AccommodationRepository;
 import lux.fm.bookingservice.repository.BookingRepository;
-import lux.fm.bookingservice.repository.UserRepository;
+import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
 import org.springframework.security.core.Authentication;
@@ -29,8 +29,8 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
-    private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final PaymentRepository paymentRepository;
 
     @Override
     @Transactional
@@ -137,9 +137,9 @@ public class BookingServiceImpl implements BookingService {
 
     private void validateExistingBookings(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        Boolean bookings = bookingRepository
-                .existsBookingByUserAndPaymentStatus(user, Payment.Status.PENDING);
-        if (bookings) {
+        Boolean payments = paymentRepository
+                .existsPaymentByBookingUserAndStatus(user, Payment.Status.PENDING);
+        if (payments) {
             throw new BookingException("You have a payment with status PENDING");
         }
     }
