@@ -158,16 +158,7 @@ public class BookingServiceImpl implements BookingService {
                 String.valueOf(accommodation.getType()),
                 booking.getCheckIn(),
                 booking.getCheckOut(),
-                getTotal(booking)
+                booking.getTotal()
         );
-    }
-
-    private BigDecimal getTotal(Booking booking) {
-        return booking.getAccommodation().getDailyRate()
-                .multiply(BigDecimal.valueOf(
-                        ChronoUnit.DAYS.between(
-                                booking.getCheckIn(), booking.getCheckOut()
-                        )
-                ));
     }
 }
