@@ -1,4 +1,12 @@
 package lux.fm.bookingservice.dto.payment;
 
-public record PaymentResponseDto() {
+import static lux.fm.bookingservice.model.Payment.Status;
+
+import java.math.BigDecimal;
+
+public record PaymentResponseDto(
+        Long bookingId,
+        Status status,
+        String sessionUrl,
+        BigDecimal amountToPay) {
 }

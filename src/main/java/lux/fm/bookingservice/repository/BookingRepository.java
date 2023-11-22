@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    Optional<Booking> findBookingByUserEmailAndId(String email, Long id);
+    Optional<Booking> findByUserEmailAndId(String email, Long id);
 
     List<Booking> findBookingsByUserEmail(String email);
 

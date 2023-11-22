@@ -6,7 +6,10 @@ import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
-import lux.fm.bookingservice.dto.payment.CreatePaymentRequestDto;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import lux.fm.bookingservice.dto.payment.PaymentSessionDto;
+import lux.fm.bookingservice.exception.PaymentException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,6 +21,7 @@ public class StripeService {
     private static final String CURRENCY = "USD";
     private static final BigDecimal CENTS_AMOUNT = BigDecimal.valueOf(100);
     private static final Long DEFAULT_QUANTITY = 1L;
+    private static final int EXPIRATION_TIME_IN_MINUTES = 10;
     @Value("${stripe.secret.key}")
     private String stripeSecretKey;
 
@@ -26,14 +30,21 @@ public class StripeService {
         Stripe.apiKey = stripeSecretKey;
     }
 
-    public String createStripeSession(
-            CreatePaymentRequestDto requestDto,
-            UriComponentsBuilder uriComponentsBuilder) throws StripeException {
+    public Session createStripeSession(
+            PaymentSessionDto requestDto,
+            UriComponentsBuilder uriComponentsBuilder) {
         SessionCreateParams params =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setSuccessUrl(uriComponentsBuilder.path(SUCCESS_URL).build().toUriString())
-                        .setCancelUrl(uriComponentsBuilder.path(CANCEL_URL).build().toUriString())
+                        .setExpiresAt(getExpirationTime())
+                        .setSuccessUrl(
+                                uriComponentsBuilder.path(SUCCESS_URL).build().toUriString()
+                                        + "?session_id={CHECKOUT_SESSION_ID}"
+                        )
+                        .setCancelUrl(
+                                uriComponentsBuilder.path(CANCEL_URL).build().toUriString()
+                                        + "?session_id={CHECKOUT_SESSION_ID}"
+                        )
                         .addLineItem(
                                 SessionCreateParams.LineItem.builder()
                                         .setQuantity(DEFAULT_QUANTITY)
@@ -46,15 +57,25 @@ public class StripeService {
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData
                                                                 .ProductData.builder()
-                                                                .setName("Some name")
-                                                                .setDescription("Description")
+                                                                .setName(requestDto.name())
+                                                                .setDescription(
+                                                                        requestDto.description())
                                                                 .build()
                                                 )
                                                 .build())
                                         .build())
                         .build();
-        Session session = Session.create(params);
+        try {
+            return Session.create(params);
+        } catch (StripeException ex) {
+            throw new PaymentException("Cant create stripe session");
+        }
+    }
 
-        return session.getUrl();
+    // @Todo: Fix expiration
+    private long getExpirationTime() {
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime expirationTime = currentTime.plusMinutes(EXPIRATION_TIME_IN_MINUTES);
+        return expirationTime.toEpochSecond(ZoneOffset.UTC);
     }
 }
