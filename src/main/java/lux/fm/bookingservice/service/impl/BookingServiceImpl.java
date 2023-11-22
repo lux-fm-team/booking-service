@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
+    public static final int MAXIMUM_USER_BOOKINGS_CAPACITY = 5;
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
@@ -117,7 +118,7 @@ public class BookingServiceImpl implements BookingService {
         }
         expireStripeSession(booking);
         User user = (User) authentication.getPrincipal();
-        if (user.getBooking().size() >= 5) {
+        if (user.getBooking().size() >= MAXIMUM_USER_BOOKINGS_CAPACITY) {
             throw new BookingException("User can't have more than 5 bookings at a time");
         }
 
