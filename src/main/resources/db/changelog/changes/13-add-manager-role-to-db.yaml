@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-manager-role-to-db
+      author: AlexRosenkreuz
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: ROLE_MANAGER
