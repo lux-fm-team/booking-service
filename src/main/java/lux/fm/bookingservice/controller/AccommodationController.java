@@ -36,7 +36,7 @@ public class AccommodationController {
     @Operation(summary = "Create a new accommodation",
             description = "Add a new accommodation to DB")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping
     public AccommodationDto save(
             @Valid @RequestBody CreateAccommodationRequestDto accommodationRequestDto) {
@@ -59,7 +59,7 @@ public class AccommodationController {
 
     @Operation(summary = "Update an accommodation", description =
             "Update information about an accommodation by id")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/{id}")
     public AccommodationDto updateById(
             @Positive @PathVariable Long id,
