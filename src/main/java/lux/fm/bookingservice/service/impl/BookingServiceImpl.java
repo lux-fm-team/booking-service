@@ -19,7 +19,6 @@ import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.AccommodationRepository;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
-import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,55 +32,8 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
-    private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final PaymentRepository paymentRepository;
-
-    @Override
-    @Scheduled(cron = "0 0 0 * * ?")
-    @Transactional
-    public void checkExpiredBookings() {
-        List<Booking> expiredBookings = bookingRepository.checkExpiredBookings(
-                LocalDate.now().plusDays(1)
-        );
-        List<User> telegramUsers = userRepository.findAllByTelegramIdIsNotNull();
-
-        if (telegramUsers.isEmpty()) {
-            return;
-        }
-
-        if (expiredBookings.isEmpty()) {
-            String message = "No expired bookings today!";
-            telegramUsers.stream()
-                    .map(User::getTelegramId)
-                    .forEach(chatId -> notificationService.notifyUser(chatId, message));
-            return;
-        }
-
-        telegramUsers.stream()
-                .map(User::getTelegramId)
-                .forEach(chatId -> {
-                    expiredBookings.stream()
-                            .forEach(booking -> {
-                                booking.setStatus(Status.EXPIRED);
-                                Accommodation accommodation = booking.getAccommodation();
-                                accommodation.setAvailability(accommodation.getAvailability() + 1);
-                                String message = """
-                                        A new accommodation is available!
-                                        -type: %s
-                                        -location: %2s
-                                        -size: %3s
-                                        -daily rate: %d"""
-                                        .formatted(
-                                            accommodation.getType().name(),
-                                            accommodation.getLocation(),
-                                            accommodation.getSize(),
-                                            accommodation.getDailyRate().intValue()
-                                        );
-                                notificationService.notifyUser(chatId, message);
-                            });
-                });
-    }
 
     @Override
     @Transactional

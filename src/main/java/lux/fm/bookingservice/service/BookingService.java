@@ -8,8 +8,6 @@ import lux.fm.bookingservice.model.Booking;
 import org.springframework.security.core.Authentication;
 
 public interface BookingService {
-    void checkExpiredBookings();
-
     List<BookingResponseDto> findBookingsByUserIdAndStatus(Long id, Booking.Status status);
 
     List<BookingResponseDto> findUserBookings(String token);
