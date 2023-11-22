@@ -137,7 +137,6 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-
     private void validateUnpaidBookings(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         if (paymentRepository
@@ -153,7 +152,7 @@ public class BookingServiceImpl implements BookingService {
                 Type: %s
                 Check in date: %s
                 Check out date: %s
-                Total: %.2f
+                Total: $%.2f
                 """.formatted(
                 accommodation.getLocation(),
                 String.valueOf(accommodation.getType()),
