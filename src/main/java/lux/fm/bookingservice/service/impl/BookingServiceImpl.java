@@ -90,10 +90,11 @@ public class BookingServiceImpl implements BookingService {
                         )
                 );
         if (booking.getPayment().getStatus().equals(Payment.Status.PENDING)) {
+            expireStripeSession(booking);
             throw new BookingException(
                     "Can't update booking until payment is completed");
         }
-        expireStripeSession(booking);
+
         validateAvailablePlaces(
                 booking.getAccommodation(),
                 requestUpdateDto.checkIn(),
