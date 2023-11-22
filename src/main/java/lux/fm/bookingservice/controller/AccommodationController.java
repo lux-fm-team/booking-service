@@ -36,7 +36,7 @@ public class AccommodationController {
     @Operation(summary = "Create a new accommodation",
             description = "Add a new accommodation to DB")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public AccommodationDto save(
             @Valid @RequestBody CreateAccommodationRequestDto accommodationRequestDto) {
@@ -59,7 +59,7 @@ public class AccommodationController {
 
     @Operation(summary = "Update an accommodation", description =
             "Update information about an accommodation by id")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public AccommodationDto updateById(
             @Positive @PathVariable Long id,
@@ -69,7 +69,7 @@ public class AccommodationController {
 
     @Operation(summary = "Delete an accommodation", description = "Delete an accommodation by id")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void delete(@Positive @PathVariable Long id) {
         accommodationService.deleteById(id);
