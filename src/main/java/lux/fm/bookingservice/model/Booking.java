@@ -13,8 +13,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -60,5 +62,12 @@ public class Booking {
         CONFIRMED,
         CANCELED,
         EXPIRED
+    }
+
+    public BigDecimal getTotal() {
+        return accommodation.getDailyRate()
+                .multiply(BigDecimal.valueOf(
+                        ChronoUnit.DAYS.between(checkIn, checkOut)
+                ));
     }
 }
