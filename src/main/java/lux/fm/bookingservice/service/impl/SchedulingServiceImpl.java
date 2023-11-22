@@ -23,11 +23,11 @@ public class SchedulingServiceImpl implements SchedulingService {
     @Transactional
     public void checkExpiredBookings() {
         List<Booking> expiredBookings = bookingRepository.checkExpiredBookings(
-                LocalDate.now().plusDays(1)
+                LocalDate.now().minusDays(1)
         );
 
         if (expiredBookings.isEmpty()) {
-            String message = "No expired bookings today!";
+            String message = "No expired bookings since yesterday!";
             notificationService.notifyAllUsers(message);
             return;
         }

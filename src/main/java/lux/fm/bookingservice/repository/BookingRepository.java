@@ -25,6 +25,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "OR (b.checkOut between :checkIn and :checkOut))")
     Long countBookingsInDateRange(Long accommodationId, LocalDate checkIn, LocalDate checkOut);
 
-    @Query("SELECT b FROM Booking as b WHERE b.checkOut <= :tomorrow")
-    List<Booking> checkExpiredBookings(@Param("tomorrow") LocalDate tomorrow);
+    @Query("SELECT b FROM Booking as b WHERE b.checkOut = :today ")
+    List<Booking> checkExpiredBookings(@Param("today") LocalDate today);
 }
