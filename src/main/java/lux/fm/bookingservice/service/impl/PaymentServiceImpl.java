@@ -11,7 +11,9 @@ import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.dto.payment.CreatePaymentRequestDto;
 import lux.fm.bookingservice.dto.payment.PaymentResponseDto;
 import lux.fm.bookingservice.dto.payment.PaymentSessionDto;
+import lux.fm.bookingservice.dto.payment.PaymentWithoutSessionDto;
 import lux.fm.bookingservice.exception.PaymentException;
+import lux.fm.bookingservice.mapper.BookingMapper;
 import lux.fm.bookingservice.mapper.PaymentMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
@@ -29,6 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final PaymentMapper paymentMapper;
+    private final BookingMapper bookingMapper;
     private final StripeService stripeService;
 
     @Override
@@ -75,13 +78,27 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public BookingResponseDto success(String sessionId) {
-        return null;
+    @Transactional
+    public PaymentWithoutSessionDto successPayment(String sessionId) {
+        Payment payment = paymentRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new PaymentException("Payment session not found"));
+        payment.setStatus(Payment.Status.PAID);
+
+        Booking booking = payment.getBooking();
+        booking.setStatus(Status.CONFIRMED);
+        return paymentMapper.toDtoWithoutSession(payment);
     }
 
     @Override
-    public PaymentResponseDto cancel(String sessionId) {
-        return null;
+    @Transactional
+    public BookingResponseDto cancelPayment(String sessionId) {
+        Payment payment = paymentRepository.findBySessionIdAndStatus(
+                sessionId, Payment.Status.PENDING)
+                .orElseThrow(() -> new PaymentException("Payment session not found"));
+        Booking booking = payment.getBooking();
+        // @Todo: invalidate Stripe session
+        paymentRepository.delete(payment);
+        return bookingMapper.toDto(booking);
     }
 
     @Override

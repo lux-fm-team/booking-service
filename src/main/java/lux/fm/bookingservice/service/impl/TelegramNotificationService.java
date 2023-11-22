@@ -21,11 +21,6 @@ public class TelegramNotificationService implements NotificationService {
 
     public void notifyAllUsers(String message) {
         List<User> telegramUsers = userRepository.findAllByTelegramIdIsNotNull();
-
-        if (telegramUsers.isEmpty()) {
-            return;
-        }
-
         telegramUsers.stream()
                 .map(User::getTelegramId)
                 .forEach(chatId -> notifyUser(chatId, message));

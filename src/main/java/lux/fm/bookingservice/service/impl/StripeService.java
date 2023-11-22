@@ -38,12 +38,12 @@ public class StripeService {
                         .setMode(SessionCreateParams.Mode.PAYMENT)
                         .setExpiresAt(getExpirationTime())
                         .setSuccessUrl(
-                                uriComponentsBuilder.path(SUCCESS_URL).build().toUriString()
-                                        + "?session_id={CHECKOUT_SESSION_ID}"
+                                uriComponentsBuilder.replacePath(SUCCESS_URL).build().toUriString()
+                                        + "?sessionId={CHECKOUT_SESSION_ID}"
                         )
                         .setCancelUrl(
-                                uriComponentsBuilder.path(CANCEL_URL).build().toUriString()
-                                        + "?session_id={CHECKOUT_SESSION_ID}"
+                                uriComponentsBuilder.replacePath(CANCEL_URL).build().toUriString()
+                                        + "?sessionId={CHECKOUT_SESSION_ID}"
                         )
                         .addLineItem(
                                 SessionCreateParams.LineItem.builder()

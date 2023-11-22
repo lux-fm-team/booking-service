@@ -2,6 +2,7 @@ package lux.fm.bookingservice.mapper;
 
 import lux.fm.bookingservice.config.MapperConfig;
 import lux.fm.bookingservice.dto.payment.PaymentResponseDto;
+import lux.fm.bookingservice.dto.payment.PaymentWithoutSessionDto;
 import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Payment;
 import org.mapstruct.Mapper;
@@ -17,4 +18,7 @@ public interface PaymentMapper {
 
     @Mapping(target = "bookingId", source = "payment.booking.id")
     PaymentResponseDto toDto(Payment payment);
+
+    @Mapping(target = "bookingId", source = "payment.booking.id")
+    PaymentWithoutSessionDto toDtoWithoutSession(Payment payment);
 }

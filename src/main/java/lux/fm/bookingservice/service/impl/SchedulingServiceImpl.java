@@ -34,7 +34,7 @@ public class SchedulingServiceImpl implements SchedulingService {
             return;
         }
 
-        expiredBookings.stream()
+        expiredBookings
                 .forEach(booking -> {
                     booking.setStatus(Booking.Status.EXPIRED);
                     Accommodation accommodation = booking.getAccommodation();
