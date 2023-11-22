@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
-import lux.fm.bookingservice.AbstractMySqlAwareTest;
+import lux.fm.bookingservice.AbstractPostgresAwareTest;
 import lux.fm.bookingservice.dto.exception.ErrorResponseWrapper;
 import lux.fm.bookingservice.dto.user.UserLoginRequestDto;
 import lux.fm.bookingservice.dto.user.UserLoginResponseDto;
@@ -32,7 +32,7 @@ import org.springframework.web.context.WebApplicationContext;
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
-public class AuthenticationControllerTest extends AbstractMySqlAwareTest {
+public class AuthenticationControllerTest extends AbstractPostgresAwareTest {
     protected static MockMvc mockMvc;
     private static ObjectMapper objectMapper;
 

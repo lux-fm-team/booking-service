@@ -7,7 +7,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
-public abstract class AbstractMySqlAwareTest {
+public abstract class AbstractPostgresAwareTest {
     @Container
     @ServiceConnection
      private static PostgreSQLContainer<?> postgreSQLContainer =

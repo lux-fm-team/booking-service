@@ -20,6 +20,7 @@ public record CreateAccommodationRequestDto(
         @Positive
         BigDecimal dailyRate,
         @NotNull
+        @Positive
         Integer availability
 ) {
 }

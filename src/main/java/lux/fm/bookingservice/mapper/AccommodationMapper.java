@@ -5,6 +5,7 @@ import lux.fm.bookingservice.dto.accommodation.AccommodationDto;
 import lux.fm.bookingservice.dto.accommodation.CreateAccommodationRequestDto;
 import lux.fm.bookingservice.model.Accommodation;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper(config = MapperConfig.class)
 public interface AccommodationMapper {
@@ -13,4 +14,7 @@ public interface AccommodationMapper {
     Accommodation toEntity(AccommodationDto accommodationDto);
 
     Accommodation toAccommodation(CreateAccommodationRequestDto accommodationRequestDto);
+
+    void updateAccommodation(CreateAccommodationRequestDto requestDto,
+                             @MappingTarget Accommodation accommodation);
 }
