@@ -1,10 +1,10 @@
 package lux.fm.bookingservice.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.accommodation.AccommodationDto;
 import lux.fm.bookingservice.dto.accommodation.CreateAccommodationRequestDto;
+import lux.fm.bookingservice.exception.EntityNotFoundException;
 import lux.fm.bookingservice.mapper.AccommodationMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.repository.accommodation.AccommodationRepository;
@@ -20,8 +20,8 @@ public class AccommodationServiceImpl implements AccommodationService {
 
     @Override
     public AccommodationDto save(CreateAccommodationRequestDto accommodationRequestDto) {
-        return accommodationMapper.toDto(accommodationRepository.save(
-                accommodationMapper.toAccommodation(accommodationRequestDto)));
+        Accommodation accommodation = accommodationMapper.toAccommodation(accommodationRequestDto);
+        return accommodationMapper.toDto(accommodationRepository.save(accommodation));
     }
 
     @Override
@@ -42,15 +42,21 @@ public class AccommodationServiceImpl implements AccommodationService {
     @Override
     public AccommodationDto updateById(
             Long id, CreateAccommodationRequestDto accommodationRequestDto) {
-        findById(id);
-        Accommodation accommodation = accommodationMapper.toAccommodation(
-                accommodationRequestDto);
-        accommodation.setId(id);
+        Accommodation accommodation = accommodationRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("No accommodation with id " + id));
+        accommodationMapper.updateAccommodation(accommodationRequestDto, accommodation);
         return accommodationMapper.toDto(accommodationRepository.save(accommodation));
     }
 
     @Override
     public void deleteById(Long id) {
+        checkAccommodationExistById(id);
         accommodationRepository.deleteById(id);
+    }
+
+    private void checkAccommodationExistById(Long id) {
+        if (!accommodationRepository.existsById(id)) {
+            throw new EntityNotFoundException("Accommodation doesn't exist with id " + id);
+        }
     }
 }
