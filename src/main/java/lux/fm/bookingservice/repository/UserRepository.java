@@ -1,5 +1,6 @@
 package lux.fm.bookingservice.repository;
 
+import java.util.List;
 import java.util.Optional;
 import lux.fm.bookingservice.model.User;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -15,4 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @EntityGraph(attributePaths = "roles")
     Optional<User> findById(Long id);
+
+    List<User> findAllByTelegramIdIsNotNull();
 }
