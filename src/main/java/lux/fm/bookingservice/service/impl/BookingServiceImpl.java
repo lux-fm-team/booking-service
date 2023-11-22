@@ -38,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
             Authentication authentication,
             BookingRequestCreateDto request
     ) {
-        validateExistingBookings(authentication);
+        validateUnpaidBookings(authentication);
 
         Accommodation accommodation = getAccommodation(request.accommodationId());
         User user = (User) authentication.getPrincipal();
@@ -135,11 +135,10 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private void validateExistingBookings(Authentication authentication) {
+    private void validateUnpaidBookings(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        Boolean payments = paymentRepository
-                .existsPaymentByBookingUserAndStatus(user, Payment.Status.PENDING);
-        if (payments) {
+        if (paymentRepository
+                .existsPaymentByBookingUserAndStatus(user, Payment.Status.PENDING)) {
             throw new BookingException("You have a payment with status PENDING");
         }
     }
