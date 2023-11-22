@@ -6,6 +6,7 @@ import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.dto.payment.CreatePaymentRequestDto;
@@ -21,6 +22,7 @@ import lux.fm.bookingservice.model.Payment;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.service.PaymentService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -102,7 +104,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<PaymentResponseDto> findByUser(Long userId) {
-        return null;
+    public List<PaymentWithoutSessionDto> findByUser(Long userId, Pageable pageable) {
+        return Optional.ofNullable(userId)
+                .map((id) -> paymentRepository.findByUser(id, pageable))
+                .orElseGet(() -> paymentRepository.findAll(pageable))
+                .stream()
+                .map(paymentMapper::toDtoWithoutSession)
+                .toList();
     }
 }
