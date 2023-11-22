@@ -119,9 +119,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Scheduled(fixedRate = THREE_MINUTES_IN_MS)
     public void checkBookingLifeTime() {
-        bookingRepository.findByStatus(Status.PENDING).stream()
-                .filter(e -> e.getTimeToLive().isBefore(LocalTime.now()))
-                .forEach(bookingRepository::delete);
+        bookingRepository.deleteAll(
+                bookingRepository.findByStatusAndTimeToLiveBefore(Status.PENDING, LocalTime.now())
+        );
     }
 
     private Accommodation getAccommodation(Long id) {

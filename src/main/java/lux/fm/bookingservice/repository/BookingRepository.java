@@ -1,6 +1,7 @@
 package lux.fm.bookingservice.repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import lux.fm.bookingservice.model.Booking;
@@ -16,7 +17,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByUserIdAndStatus(Long userId, Booking.Status stats);
 
-    List<Booking> findByStatus(Booking.Status stats);
+    List<Booking> findByStatusAndTimeToLiveBefore(Booking.Status status, LocalTime time);
 
     @Query("SELECT COUNT(b) from Booking as b where b.accommodation.id = :accommodationId "
             + "AND ((b.checkIn between :checkIn and :checkOut) "
