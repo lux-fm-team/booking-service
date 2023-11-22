@@ -1,5 +1,6 @@
 package lux.fm.bookingservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -36,6 +37,10 @@ public class PaymentController {
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(
+            summary = "Create new payment for user",
+            description = "Create new payment by user booking with Stripe API"
+    )
     public PaymentResponseDto createPayment(
             Authentication authentication,
             UriComponentsBuilder uriComponentsBuilder,
@@ -45,18 +50,32 @@ public class PaymentController {
 
     @GetMapping("/success")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(
+            summary = "Success endpoint after Stripe payment",
+            description = """
+                    It is redirect endpoint after Stripe success payment.
+                     It Makes booking paid"""
+    )
     public PaymentWithoutSessionDto successPayment(@NotBlank String sessionId) {
         return paymentService.successPayment(sessionId);
     }
 
     @GetMapping("/cancel")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(
+            summary = "Cancel payment after closing Stripe session",
+            description = "It is redirect endpoint after Stripe cancel payment"
+    )
     public BookingResponseDto cancelPayment(@NotBlank String sessionId) {
         return paymentService.cancelPayment(sessionId);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('MANAGER')")
+    @Operation(
+            summary = "Find user payments",
+            description = "Find all payments or payments by specific user"
+    )
     public List<PaymentWithoutSessionDto> findUsersPayments(
             @RequestParam(required = false) @Positive Long userId,
             @ParameterObject @PageableDefault Pageable pageable) {

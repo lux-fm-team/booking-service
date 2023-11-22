@@ -54,9 +54,9 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         if (paymentRepository.existsByBooking(booking)) {
-            throw new PaymentException(
-                    "You already have payment with booking id %d. Cancel it or pay"
-                            .formatted(booking.getId()));
+            throw new PaymentException("You already have payment with booking id %d"
+                            .formatted(booking.getId())
+            );
         }
 
         Accommodation accommodation = booking.getAccommodation();
