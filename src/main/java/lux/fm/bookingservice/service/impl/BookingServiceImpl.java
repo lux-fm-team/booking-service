@@ -13,10 +13,11 @@ import lux.fm.bookingservice.mapper.BookingMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Booking.Status;
+import lux.fm.bookingservice.model.Payment;
 import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.AccommodationRepository;
 import lux.fm.bookingservice.repository.BookingRepository;
-import lux.fm.bookingservice.repository.UserRepository;
+import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
 import org.springframework.security.core.Authentication;
@@ -28,8 +29,8 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
-    private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final PaymentRepository paymentRepository;
 
     @Override
     @Transactional
@@ -37,6 +38,8 @@ public class BookingServiceImpl implements BookingService {
             Authentication authentication,
             BookingRequestCreateDto request
     ) {
+        validateUnpaidBookings(authentication);
+
         Accommodation accommodation = getAccommodation(request.accommodationId());
         User user = (User) authentication.getPrincipal();
 
@@ -81,9 +84,9 @@ public class BookingServiceImpl implements BookingService {
             String username, BookingRequestUpdateDto requestUpdateDto, Long id) {
         Booking booking = bookingRepository.findBookingByUserEmailAndId(username, id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Booking with such id doesn't exist: " + id
-                )
-        );
+                                "Booking with such id doesn't exist: " + id
+                        )
+                );
         validateAvailablePlaces(
                 booking.getAccommodation(),
                 requestUpdateDto.checkIn(),
@@ -96,11 +99,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public void deleteBookingById(Authentication authentication, Long id) {
         Booking booking = bookingRepository.findBookingByUserEmailAndId(
-                authentication.getName(), id)
+                        authentication.getName(), id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Booking with such id doesn't exist: " + id
-                )
-        );
+                                "Booking with such id doesn't exist: " + id
+                        )
+                );
         User user = (User) authentication.getPrincipal();
 
         if (user.getTelegramId() != null) {
@@ -129,6 +132,14 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingException(
                     "The accommodation isn't available with id: " + accommodation.getId()
             );
+        }
+    }
+
+    private void validateUnpaidBookings(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        if (paymentRepository
+                .existsPaymentByBookingUserAndStatus(user, Payment.Status.PENDING)) {
+            throw new BookingException("You have a payment with status PENDING");
         }
     }
 }

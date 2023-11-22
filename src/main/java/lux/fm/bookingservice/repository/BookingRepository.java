@@ -20,4 +20,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "AND ((b.checkIn between :checkIn and :checkOut) "
             + "OR (b.checkOut between :checkIn and :checkOut))")
     Long countBookingsInDateRange(Long accommodationId, LocalDate checkIn, LocalDate checkOut);
+
 }
