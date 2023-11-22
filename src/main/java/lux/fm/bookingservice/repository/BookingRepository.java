@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lux.fm.bookingservice.model.Booking;
+import lux.fm.bookingservice.model.Payment;
 import lux.fm.bookingservice.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,5 +23,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             + "OR (b.checkOut between :checkIn and :checkOut))")
     Long countBookingsInDateRange(Long accommodationId, LocalDate checkIn, LocalDate checkOut);
 
-    Boolean existsBookingByUserAndStatus(User user, Booking.Status status);
+    Boolean existsBookingByUserAndPaymentStatus(User user, Payment.Status status);
 }

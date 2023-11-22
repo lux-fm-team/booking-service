@@ -13,6 +13,7 @@ import lux.fm.bookingservice.mapper.BookingMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Booking.Status;
+import lux.fm.bookingservice.model.Payment;
 import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.AccommodationRepository;
 import lux.fm.bookingservice.repository.BookingRepository;
@@ -136,9 +137,9 @@ public class BookingServiceImpl implements BookingService {
 
     private void validateExistingBookings(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        Boolean bookings = bookingRepository.existsBookingByUserAndStatus(user, Status.PENDING);
+        Boolean bookings = bookingRepository.existsBookingByUserAndPaymentStatus(user, Payment.Status.PENDING);
         if (bookings) {
-            throw new BookingException("You have a booking with status PENDING");
+            throw new BookingException("You have a payment with status PENDING");
         }
     }
 }
