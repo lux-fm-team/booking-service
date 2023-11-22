@@ -1,5 +1,7 @@
 package lux.fm.bookingservice.service.impl;
 
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -86,6 +88,11 @@ public class BookingServiceImpl implements BookingService {
                                 "Booking with such id doesn't exist: " + id
                         )
                 );
+        if(booking.getPayment().getStatus().equals(Payment.Status.PENDING)) {
+            throw new BookingException(
+                    "Can't update booking until payment is completed");
+        }
+        expireStripeSession(booking);
         validateAvailablePlaces(
                 booking.getAccommodation(),
                 requestUpdateDto.checkIn(),
@@ -108,14 +115,25 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getStatus() != Status.PENDING) {
             throw new BookingException("Booking can't be deleted on this stage");
         }
-
+        expireStripeSession(booking);
         User user = (User) authentication.getPrincipal();
+        if (user.getBooking().size() >= 5) {
+            throw new BookingException("User can't have more than 5 bookings at a time");
+        }
 
         if (user.getTelegramId() != null) {
             notificationService.notifyAboutCanceledBooking(user.getTelegramId(), booking);
         }
 
         bookingRepository.delete(booking);
+    }
+
+    private void expireStripeSession(Booking booking) {
+        try {
+            Session.retrieve(booking.getPayment().getSessionId()).expire();
+        } catch (StripeException e) {
+            throw new BookingException("Unsuccessful try to expire stripe session", e);
+        }
     }
 
     private Accommodation getAccommodation(Long id) {
