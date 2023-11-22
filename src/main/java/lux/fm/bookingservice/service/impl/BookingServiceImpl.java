@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    public static final int MAXIMUM_USER_BOOKINGS_CAPACITY = 5;
+    private static final int MAXIMUM_USER_BOOKINGS_CAPACITY = 5;
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
