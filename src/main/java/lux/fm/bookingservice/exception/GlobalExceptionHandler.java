@@ -1,5 +1,6 @@
 package lux.fm.bookingservice.exception;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
@@ -59,6 +60,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ErrorResponseWrapper handleBookingException(RuntimeException ex) {
         return new ErrorResponseWrapper(LocalDateTime.now(), "bad-request", ex.getMessage());
+    }
+
+    @ExceptionHandler(JwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponseWrapper handleJwtException(JwtException ex) {
+        return new ErrorResponseWrapper(LocalDateTime.now(), "invalid-or-expired-token",
+                ex.getMessage());
     }
 
     private String getErrorMessage(ObjectError e) {
