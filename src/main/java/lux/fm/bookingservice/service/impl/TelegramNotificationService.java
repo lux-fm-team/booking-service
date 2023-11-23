@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Payment;
-import lux.fm.bookingservice.notifications.Bot;
+import lux.fm.bookingservice.telegram.Bot;
 import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.NotificationService;
 import org.springframework.stereotype.Service;

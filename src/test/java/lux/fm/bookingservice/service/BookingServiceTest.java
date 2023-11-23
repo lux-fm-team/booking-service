@@ -1,4 +1,4 @@
-package lux.fm.bookingservice;
+package lux.fm.bookingservice.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
