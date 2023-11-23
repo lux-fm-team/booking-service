@@ -1,7 +1,5 @@
 package lux.fm.bookingservice.service.impl;
 
-import com.stripe.exception.StripeException;
-import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
