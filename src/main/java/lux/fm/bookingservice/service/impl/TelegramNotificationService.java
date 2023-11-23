@@ -38,7 +38,7 @@ public class TelegramNotificationService implements NotificationService {
     @Override
     public void notifyAboutCanceledBooking(Long userId, Booking booking) {
         String message = """
-                ⚠️*Your booked was canceled*
+                ⚠️*Your booking was canceled*
                 Check info about it
                 %s""".formatted(getBookingInfo(booking)
         );

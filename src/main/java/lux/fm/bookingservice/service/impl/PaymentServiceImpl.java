@@ -87,9 +87,12 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentWithoutSessionDto successPayment(String sessionId) {
         Payment payment = paymentRepository.findBySessionId(sessionId)
                 .orElseThrow(() -> new PaymentException("Payment session not found"));
+        if (!stripeService.isSessionPaid(sessionId)) {
+            throw new PaymentException("Payment hasn't gone through yet. "
+                    + "Follow the session and pay for your booking");
+        }
         payment.setStatus(Payment.Status.PAID);
         payment.setSessionId(UUID.randomUUID().toString());
-
         Booking booking = payment.getBooking();
         booking.setStatus(Status.CONFIRMED);
 
