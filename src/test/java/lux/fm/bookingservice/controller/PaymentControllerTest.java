@@ -68,7 +68,6 @@ public class PaymentControllerTest extends AbstractPostgresAwareTest {
                 .hasFieldOrPropertyWithValue("status", PENDING)
                 .hasFieldOrProperty("sessionUrl").isNotNull()
                 .hasFieldOrPropertyWithValue("amountToPay", BigDecimal.valueOf(20));
-
     }
 
     @Test
