@@ -4,7 +4,6 @@ import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
-import java.util.EmptyStackException;
 import java.util.List;
 import lux.fm.bookingservice.dto.exception.ErrorResponseWrapper;
 import lux.fm.bookingservice.dto.exception.ErrorsResponseWrapper;
@@ -68,12 +67,6 @@ public class GlobalExceptionHandler {
     public ErrorResponseWrapper handleJwtException(JwtException ex) {
         return new ErrorResponseWrapper(LocalDateTime.now(), "invalid-or-expired-token",
                 ex.getMessage());
-    }
-
-    @ExceptionHandler(EmptyStackException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    protected ErrorResponseWrapper handleEmptyStackException(EmptyStackException ex) {
-        return new ErrorResponseWrapper(LocalDateTime.now(), "bad-request", ex.getMessage());
     }
 
     private String getErrorMessage(ObjectError e) {

@@ -73,7 +73,7 @@ public class StripeService {
         try {
             return Session.create(params);
         } catch (StripeException ex) {
-            log.error("ERROR: {}",ex.getMessage(),ex);
+            log.error("Error during Stripe session creation: ",ex);
             throw new PaymentException("Cant create stripe session");
         }
     }
@@ -94,7 +94,6 @@ public class StripeService {
         }
     }
 
-    // @Todo: Fix expiration
     private long getExpirationTime() {
         LocalDateTime currentTime = LocalDateTime.now();
         LocalDateTime expirationTime = currentTime.plusMinutes(EXPIRATION_TIME_IN_MINUTES);
