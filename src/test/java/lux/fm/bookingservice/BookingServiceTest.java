@@ -105,10 +105,11 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Create new valid booking")
     void create_validBooking_ReturnBookingResponseRto() {
-        when(authentication.getPrincipal()).thenReturn(user);
+        when(authentication.getName()).thenReturn(user.getEmail());
         when(accommodationRepository.findById(1L)).thenReturn(Optional.of(accommodation));
         when(bookingRepository.save(booking)).thenReturn(booking);
         when(bookingMapper.toModel(requestDto)).thenReturn(booking);
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.ofNullable(user));
         doNothing().when(notificationService).notifyUser(any(), any());
 
         BookingResponseDto dto = bookingService.addBooking(authentication, requestDto);
@@ -182,7 +183,7 @@ public class BookingServiceTest {
     @Test
     @DisplayName("Delete existing booking")
     void delete_existingBookingById() {
-        when(authentication.getPrincipal()).thenReturn(user);
+        when(userRepository.findByEmail(any())).thenReturn(Optional.ofNullable(user));
         when(bookingRepository.findByUserEmailAndId(any(), any()))
                 .thenReturn(Optional.of(booking));
         doNothing().when(notificationService).notifyUser(any(), any());
