@@ -1,0 +1,1 @@
+UPDATE bookings set status = 'CONFIRMED';
