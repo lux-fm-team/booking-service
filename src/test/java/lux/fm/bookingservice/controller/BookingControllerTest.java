@@ -1,17 +1,24 @@
 package lux.fm.bookingservice.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import lombok.SneakyThrows;
-import lux.fm.bookingservice.dto.accommodation.AccommodationDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.dto.exception.ErrorResponseWrapper;
 import lux.fm.bookingservice.model.Booking;
-import lux.fm.bookingservice.model.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,16 +35,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
@@ -178,12 +175,12 @@ public class BookingControllerTest {
     void updateBooking() throws Exception {
         long id = 1L;
         BookingRequestUpdateDto updateDto = new BookingRequestUpdateDto(
-          LocalDate.now().plusYears(1),
-          LocalDate.now().plusDays(1).plusYears(1)
+                LocalDate.now().plusYears(1),
+                LocalDate.now().plusDays(1).plusYears(1)
         );
         MvcResult mvcResult = mockMvc.perform(put("/api/bookings/" + id)
-                .content(objectMapper.writeValueAsString(updateDto))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(updateDto))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 

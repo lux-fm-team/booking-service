@@ -34,6 +34,7 @@ public class BookingServiceImpl implements BookingService {
     private final NotificationService notificationService;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
+
     @Override
     @Transactional
     public BookingResponseDto addBooking(
@@ -122,7 +123,8 @@ public class BookingServiceImpl implements BookingService {
         }
 
         User user = userRepository.findByEmail(authentication.getName()).orElseThrow(
-                () -> new EntityNotFoundException("No user with such email" + authentication.getName())
+                () -> new EntityNotFoundException("No user with such email"
+                        + authentication.getName())
         );
         if (user.getBooking().size() >= MAXIMUM_USER_BOOKINGS_CAPACITY) {
             throw new BookingException("User can't have more than 5 bookings at a time");
@@ -158,7 +160,8 @@ public class BookingServiceImpl implements BookingService {
 
     private void validateUnpaidBookings(Authentication authentication) {
         if (paymentRepository
-                .existsPaymentByBookingUserEmailAndStatus(authentication.getName(), Payment.Status.PENDING)) {
+                .existsPaymentByBookingUserEmailAndStatus(authentication.getName(),
+                        Payment.Status.PENDING)) {
             throw new BookingException("You have a payment with status PENDING");
         }
     }
