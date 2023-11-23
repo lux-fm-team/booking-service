@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "User management",
-        description = "Endpoints for usres")
+        description = "Endpoints for users")
 @RequiredArgsConstructor
 @Validated
 @RestController

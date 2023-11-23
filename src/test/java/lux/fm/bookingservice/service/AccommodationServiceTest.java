@@ -39,6 +39,8 @@ import org.mockito.quality.Strictness;
 public class AccommodationServiceTest {
     @Mock
     private AccommodationRepository accommodationRepository;
+    @Mock
+    private NotificationService notificationService;
     @Spy
     private AccommodationMapper accommodationMapper = new AccommodationMapperImpl();
     @InjectMocks
@@ -105,6 +107,7 @@ public class AccommodationServiceTest {
         accommodation.setDailyRate(requestDto.dailyRate());
         accommodation.setAvailability(requestDto.availability());
 
+        doNothing().when(notificationService).notifyAboutCreatedAccommodation(any());
         when(accommodationRepository.save(any())).thenReturn(accommodation);
 
         AccommodationDto accommodationDto = accommodationService.save(requestDto);

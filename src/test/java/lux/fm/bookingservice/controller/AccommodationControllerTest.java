@@ -57,7 +57,7 @@ public class AccommodationControllerTest extends AbstractPostgresAwareTest {
 
     @Test
     @DisplayName("Create valid accommodation")
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @WithMockUser(username = "manager", roles = {"MANAGER"})
     void createAccommodation_ValidRequestDto_Success() throws Exception {
         CreateAccommodationRequestDto requestDto = new CreateAccommodationRequestDto(
                 HOUSE,
@@ -188,7 +188,7 @@ public class AccommodationControllerTest extends AbstractPostgresAwareTest {
 
     @Test
     @DisplayName("Update existent accommodation with valid request")
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @WithMockUser(username = "manager", roles = {"MANAGER"})
     @Sql(scripts = "classpath:database/accommodations/add-one-accommodation.sql")
     void updateAccommodation_ValidRequestDtoAndExistentId_Success() throws Exception {
         Long id = 1L;
