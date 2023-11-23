@@ -1,4 +1,4 @@
-package lux.fm.bookingservice;
+package lux.fm.bookingservice.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,7 +25,6 @@ import lux.fm.bookingservice.repository.AccommodationRepository;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.repository.UserRepository;
-import lux.fm.bookingservice.service.NotificationService;
 import lux.fm.bookingservice.service.impl.BookingServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package lux.fm.bookingservice.notifications;
+package lux.fm.bookingservice.telegram;
 
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -32,10 +32,17 @@ public class Bot extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private String botToken;
     @Setter
-    private String currentCommand = "";
+    private String currentState = "";
     private final UserRepository userRepository;
     private final List<String> params = new ArrayList<>();
     private final AuthenticationService authenticationService;
+    private final List<String> commands = new ArrayList<>();
+
+    {
+        commands.add("/start");
+        commands.add("/cancel");
+        commands.add("/test");
+    }
 
     @PostConstruct
     private void init() {
@@ -47,7 +54,6 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    //TODO: refactor code
     @Override
     public void onUpdateReceived(Update update) {
         SendMessage sendMessage = new SendMessage();
@@ -56,50 +62,14 @@ public class Bot extends TelegramLongPollingBot {
             sendMessage.setChatId(update.getMessage().getChatId().toString());
             String text = update.getMessage().getText();
             String chatId = update.getMessage().getChatId().toString();
-            if (text.startsWith("/cancel")) {
-                currentCommand = "";
-                params.clear();
-                sendMessage.setText("Current operation ");
-            } else if (text.startsWith("/test")) {
-                sendMessage.setText("OK");
-                sendMessage.setChatId(chatId);
-            } else if (text.startsWith("/start")) {
-                sendMessage.setText("Press login to start");
-                sendMessage.setReplyMarkup(createLoggingKeyboard());
-                sendMessage.setChatId(chatId);
-            } else if (!currentCommand.isEmpty()) {
-                if (currentCommand.equals("login")) {
-                    params.add(text);
-                    if (params.size() == 1) {
-                        sendMessage.setText("Enter your password");
-                        sendMessage.setChatId(chatId);
-                    } else if (params.size() == 2) {
-                        UserLoginRequestDto requestDto =
-                                new UserLoginRequestDto(params.get(0), params.get(1));
-                        try {
-                            authenticationService.authenticateWithTelegram(
-                                    requestDto, Long.valueOf(chatId)
-                            );
-                            sendMessage.setText("Success!");
-                            sendMessage.setChatId(chatId);
-                        } catch (BadCredentialsException e) {
-                            sendMessage.setText("Wrong email or password!");
-                            sendMessage.setChatId(chatId);
-                            sendMessage.setReplyMarkup(createLoggingKeyboard());
-                        } finally {
-                            params.clear();
-                            currentCommand = "";
-                        }
-                    }
-                }
+            if (text.startsWith("/")) {
+                sendMessage = processCommand(chatId, text);
+            } else if (!currentState.isEmpty()) {
+                sendMessage = processDialog(chatId, text);
             }
         } else if (update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
-            if (callbackQuery.getData().equals("login")) {
-                currentCommand = "login";
-                sendMessage.setChatId(callbackQuery.getMessage().getChatId().toString());
-                sendMessage.setText("Enter your email");
-            }
+            sendMessage = processCallbackQuery(callbackQuery);
         }
         try {
             execute(sendMessage);
@@ -109,13 +79,6 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    /**
-     * Sending message to user with specified id
-     *
-     * @param text text of message
-     * @param id   users id in telegram
-     */
-
     public void sendMessageToUser(String text, Long id) {
         try {
             SendMessage sendMessage = new SendMessage(id.toString(), text);
@@ -124,6 +87,62 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             throw new NotificationException("Can't send message to user with id " + id);
         }
+    }
+
+    private SendMessage processCommand(String chatId, String text) {
+        SendMessage sendMessage = new SendMessage();
+        if (text.startsWith("/cancel")) {
+            currentState = "";
+            params.clear();
+            sendMessage.setText("Current operation was canceled");
+        } else if (text.startsWith("/test")) {
+            sendMessage.setText("OK");
+            sendMessage.setChatId(chatId);
+        } else if (text.startsWith("/start")) {
+            sendMessage.setText("Press login to start");
+            sendMessage.setReplyMarkup(createLoggingKeyboard());
+            sendMessage.setChatId(chatId);
+        }
+        return sendMessage;
+    }
+
+    private SendMessage processCallbackQuery(CallbackQuery callbackQuery) {
+        SendMessage sendMessage = new SendMessage();
+        if (callbackQuery.getData().equals("login")) {
+            currentState = "login";
+            sendMessage.setChatId(callbackQuery.getMessage().getChatId().toString());
+            sendMessage.setText("Enter your email");
+        }
+        return sendMessage;
+    }
+
+    private SendMessage processDialog(String chatId, String text) {
+        SendMessage sendMessage = new SendMessage();
+        if (currentState.equals("login")) {
+            params.add(text);
+            if (params.size() == 1) {
+                sendMessage.setText("Enter your password");
+                sendMessage.setChatId(chatId);
+            } else if (params.size() == 2) {
+                UserLoginRequestDto requestDto =
+                        new UserLoginRequestDto(params.get(0), params.get(1));
+                try {
+                    authenticationService.authenticateWithTelegram(
+                            requestDto, Long.valueOf(chatId)
+                    );
+                    sendMessage.setText("Success!");
+                    sendMessage.setChatId(chatId);
+                } catch (BadCredentialsException e) {
+                    sendMessage.setText("Wrong email or password!");
+                    sendMessage.setChatId(chatId);
+                    sendMessage.setReplyMarkup(createLoggingKeyboard());
+                } finally {
+                    params.clear();
+                    currentState = "";
+                }
+            }
+        }
+        return sendMessage;
     }
 
     private InlineKeyboardMarkup createLoggingKeyboard() {
