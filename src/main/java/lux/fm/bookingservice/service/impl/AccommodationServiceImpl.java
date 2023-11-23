@@ -9,6 +9,7 @@ import lux.fm.bookingservice.mapper.AccommodationMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.repository.AccommodationRepository;
 import lux.fm.bookingservice.service.AccommodationService;
+import lux.fm.bookingservice.service.NotificationService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +18,13 @@ import org.springframework.stereotype.Service;
 public class AccommodationServiceImpl implements AccommodationService {
     private final AccommodationRepository accommodationRepository;
     private final AccommodationMapper accommodationMapper;
+    private final NotificationService notificationService;
 
     @Override
     public AccommodationDto save(CreateAccommodationRequestDto accommodationRequestDto) {
-        return accommodationMapper.toDto(accommodationRepository.save(
-                accommodationMapper.toAccommodation(accommodationRequestDto)));
+        Accommodation accommodation = accommodationMapper.toAccommodation(accommodationRequestDto);
+        notificationService.notifyAboutCreatedAccommodation(accommodation);
+        return accommodationMapper.toDto(accommodationRepository.save(accommodation));
     }
 
     @Override

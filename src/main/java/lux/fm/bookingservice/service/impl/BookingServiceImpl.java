@@ -50,8 +50,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setAccommodation(accommodation);
 
         if (user.getTelegramId() != null) {
-            String message = "Booking was created:\n" + createNotification(booking);
-            notificationService.notifyUser(user.getTelegramId(), message);
+            notificationService.notifyAboutCreatedBooking(user.getTelegramId(), booking);
         }
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
@@ -113,8 +112,7 @@ public class BookingServiceImpl implements BookingService {
         User user = (User) authentication.getPrincipal();
 
         if (user.getTelegramId() != null) {
-            String message = "Booking was deleted:\n" + createNotification(booking);
-            notificationService.notifyUser(user.getTelegramId(), message);
+            notificationService.notifyAboutCanceledBooking(user.getTelegramId(), booking);
         }
 
         bookingRepository.delete(booking);
@@ -147,22 +145,5 @@ public class BookingServiceImpl implements BookingService {
                 .existsPaymentByBookingUserAndStatus(user, Payment.Status.PENDING)) {
             throw new BookingException("You have a payment with status PENDING");
         }
-    }
-
-    private String createNotification(Booking booking) {
-        Accommodation accommodation = booking.getAccommodation();
-        return """
-                Location: %s
-                Type: %s
-                Check in date: %s
-                Check out date: %s
-                Total: $%.2f
-                """.formatted(
-                accommodation.getLocation(),
-                String.valueOf(accommodation.getType()),
-                booking.getCheckIn(),
-                booking.getCheckOut(),
-                booking.getTotal()
-        );
     }
 }
