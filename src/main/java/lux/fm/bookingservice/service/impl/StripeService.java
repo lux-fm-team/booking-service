@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.EmptyStackException;
 import java.util.Objects;
 import lux.fm.bookingservice.dto.payment.PaymentSessionDto;
 import lux.fm.bookingservice.exception.BookingException;
@@ -71,7 +72,7 @@ public class StripeService {
         try {
             return Session.create(params);
         } catch (StripeException ex) {
-            throw new PaymentException("Cant create stripe session");
+            throw new EmptyStackException();
         }
     }
 

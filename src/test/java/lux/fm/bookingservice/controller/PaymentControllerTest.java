@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import lombok.SneakyThrows;
+import lux.fm.bookingservice.AbstractPostgresAwareTest;
 import lux.fm.bookingservice.dto.payment.CreatePaymentRequestDto;
 import lux.fm.bookingservice.dto.payment.PaymentResponseDto;
 import lux.fm.bookingservice.dto.payment.PaymentWithoutSessionDto;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
@@ -30,12 +30,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "classpath:database/payments/add-all-entities.sql")
 @Sql(scripts = "classpath:database/payments/delete-all-entities.sql",
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
-public class PaymentControllerTest {
+public class PaymentControllerTest extends AbstractPostgresAwareTest {
     protected static MockMvc mockMvc;
     private static ObjectMapper objectMapper;
 
