@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.service.NotificationService;
@@ -27,31 +26,15 @@ public class SchedulingServiceImpl implements SchedulingService {
         List<Booking> expiredBookings = bookingRepository.checkExpiredBookings(
                 LocalDate.now().minusDays(1)
         );
-
         if (expiredBookings.isEmpty()) {
-            String message = "No expired bookings since yesterday!";
-            notificationService.notifyAllUsers(message);
-            return;
+            notificationService.notifyAllUsers("""
+                    ⚠️No expired bookings since yesterday!""");
+        } else {
+            expiredBookings.forEach(booking -> {
+                booking.setStatus(Booking.Status.EXPIRED);
+                notificationService.notifyAboutReleasedAccommodation(booking.getAccommodation());
+            });
         }
-
-        expiredBookings
-                .forEach(booking -> {
-                    booking.setStatus(Booking.Status.EXPIRED);
-                    Accommodation accommodation = booking.getAccommodation();
-                    String message = """ 
-                                    A new accommodation is available!
-                                    -type: %s
-                                    -location: %2s
-                                    -size: %3s
-                                    -daily rate: %.2f"""
-                                    .formatted(
-                                        accommodation.getType().name(),
-                                        accommodation.getLocation(),
-                                        accommodation.getSize(),
-                                        accommodation.getDailyRate().doubleValue()
-                                    );
-                    notificationService.notifyAllUsers(message);
-                });
     }
 
     @Override

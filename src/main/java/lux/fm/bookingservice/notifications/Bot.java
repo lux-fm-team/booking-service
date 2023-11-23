@@ -118,7 +118,9 @@ public class Bot extends TelegramLongPollingBot {
 
     public void sendMessageToUser(String text, Long id) {
         try {
-            execute(new SendMessage(id.toString(), text));
+            SendMessage sendMessage = new SendMessage(id.toString(), text);
+            sendMessage.enableMarkdown(true);
+            execute(sendMessage);
         } catch (TelegramApiException e) {
             throw new NotificationException("Can't send message to user with id " + id);
         }

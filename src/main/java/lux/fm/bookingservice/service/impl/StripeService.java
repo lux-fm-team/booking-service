@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Objects;
 import lux.fm.bookingservice.dto.payment.PaymentSessionDto;
 import lux.fm.bookingservice.exception.PaymentException;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ public class StripeService {
     private static final String SUCCESS_URL = "/api/payments/success";
     private static final String CANCEL_URL = "/api/payments/cancel";
     private static final String CURRENCY = "USD";
+    private static final String STATUS_PAID = "paid";
     private static final BigDecimal CENTS_AMOUNT = BigDecimal.valueOf(100);
     private static final Long DEFAULT_QUANTITY = 1L;
     private static final int EXPIRATION_TIME_IN_MINUTES = 10;
@@ -69,6 +71,14 @@ public class StripeService {
             return Session.create(params);
         } catch (StripeException ex) {
             throw new PaymentException("Cant create stripe session");
+        }
+    }
+
+    public Boolean isSessionPaid(String sessionId) {
+        try {
+            return Objects.equals(Session.retrieve(sessionId).getPaymentStatus(), STATUS_PAID);
+        } catch (StripeException ex) {
+            throw new PaymentException("Cant find stripe session");
         }
     }
 

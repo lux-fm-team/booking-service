@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.dto.payment.CreatePaymentRequestDto;
@@ -21,6 +22,7 @@ import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Payment;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
+import lux.fm.bookingservice.service.NotificationService;
 import lux.fm.bookingservice.service.PaymentService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -35,6 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final BookingMapper bookingMapper;
     private final StripeService stripeService;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -84,10 +87,20 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentWithoutSessionDto successPayment(String sessionId) {
         Payment payment = paymentRepository.findBySessionId(sessionId)
                 .orElseThrow(() -> new PaymentException("Payment session not found"));
+        if (!stripeService.isSessionPaid(sessionId)) {
+            throw new PaymentException("Payment hasn't gone through yet. "
+                    + "Follow the session and pay for your booking");
+        }
         payment.setStatus(Payment.Status.PAID);
-
+        payment.setSessionId(UUID.randomUUID().toString());
         Booking booking = payment.getBooking();
         booking.setStatus(Status.CONFIRMED);
+
+        Long telegramId = booking.getUser().getTelegramId();
+        if (telegramId != null) {
+            notificationService.notifyAboutSuccessPayment(telegramId, payment);
+        }
+
         return paymentMapper.toDtoWithoutSession(payment);
     }
 
