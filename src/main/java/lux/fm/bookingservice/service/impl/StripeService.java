@@ -12,7 +12,6 @@ import java.util.Objects;
 import lux.fm.bookingservice.dto.payment.PaymentSessionDto;
 import lux.fm.bookingservice.exception.BookingException;
 import lux.fm.bookingservice.exception.PaymentException;
-import lux.fm.bookingservice.model.Booking;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
