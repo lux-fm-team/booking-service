@@ -8,8 +8,8 @@ import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.EmptyStackException;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import lux.fm.bookingservice.dto.payment.PaymentSessionDto;
 import lux.fm.bookingservice.exception.BookingException;
 import lux.fm.bookingservice.exception.PaymentException;
@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+@Slf4j
 @Service
 public class StripeService {
     private static final String SUCCESS_URL = "/api/payments/success";
@@ -40,7 +41,7 @@ public class StripeService {
         SessionCreateParams params =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setExpiresAt(85000L)
+                        .setExpiresAt(getExpirationTime())
                         .setSuccessUrl(
                                 uriComponentsBuilder.replacePath(SUCCESS_URL).build().toUriString()
                                         + "?sessionId={CHECKOUT_SESSION_ID}"
@@ -72,7 +73,8 @@ public class StripeService {
         try {
             return Session.create(params);
         } catch (StripeException ex) {
-            throw new EmptyStackException();
+            log.error("ERROR: {}",ex.getMessage(),ex);
+            throw new PaymentException("Cant create stripe session");
         }
     }
 
