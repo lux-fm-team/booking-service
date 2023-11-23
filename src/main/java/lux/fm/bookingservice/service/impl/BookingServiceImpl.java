@@ -89,7 +89,8 @@ public class BookingServiceImpl implements BookingService {
                                 "Booking with such id doesn't exist: " + id
                         )
                 );
-        if (booking.getPayment().getStatus().equals(Payment.Status.PENDING)) {
+        if (booking.getPayment() != null
+                && booking.getPayment().getStatus().equals(Payment.Status.PENDING)) {
             expireStripeSession(booking);
             throw new BookingException(
                     "Can't update booking until payment is completed");
@@ -117,7 +118,11 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getStatus() != Status.PENDING) {
             throw new BookingException("Booking can't be deleted on this stage");
         }
-        expireStripeSession(booking);
+
+        if (booking.getPayment() != null) {
+            expireStripeSession(booking);
+        }
+
         User user = (User) authentication.getPrincipal();
         if (user.getBooking().size() >= MAXIMUM_USER_BOOKINGS_CAPACITY) {
             throw new BookingException("User can't have more than 5 bookings at a time");
