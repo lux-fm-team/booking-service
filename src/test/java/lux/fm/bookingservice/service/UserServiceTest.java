@@ -118,7 +118,6 @@ public class UserServiceTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User mockedUser = new User();
-        mockedUser.setId(1L);
         mockedUser.setEmail("test@example.com");
         mockedUser.setFirstName("Nam");
         mockedUser.setLastName("Dongyun");
@@ -171,9 +170,10 @@ public class UserServiceTest {
         role2.setId(2L);
         when(roleRepository.findAllById(roleIds)).thenReturn(List.of(role1, role2));
 
-        UserResponseDtoWithRoles result = userService.updateUserRoles(mockedUser.getId(), updateDto);
+        UserResponseDtoWithRoles result = userService.updateUserRoles(
+                mockedUser.getId(), updateDto);
 
-        assertThat(result.getRoleIds()).contains(1L, 2L);
+        assertThat(result.getRoleIds()).contains(role1.getId(), role2.getId());
         verify(userRepository, times(1)).findById(anyLong());
         verify(roleRepository, times(1)).findAllById(roleIds);
         verify(userRepository, times(1)).save(any());
@@ -183,13 +183,12 @@ public class UserServiceTest {
     @Test
     @DisplayName("Update User Roles - User Not Found")
     void updateUserRolesTest_NotFound() {
-        Long userId = 1L;
         UpdateUserRolesRequestDto updateDto = new UpdateUserRolesRequestDto();
         Set<Long> roleIds = new HashSet<>();
         roleIds.add(1L);
         roleIds.add(2L);
         updateDto.setRoleIds(roleIds);
-
+        Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.updateUserRoles(userId, updateDto))
