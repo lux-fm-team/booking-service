@@ -95,13 +95,15 @@ public class Bot extends TelegramLongPollingBot {
             currentState = "";
             params.clear();
             sendMessage.setText("Current operation was canceled");
-        } else if (text.startsWith("/test")) {
-            sendMessage.setText("OK");
             sendMessage.setChatId(chatId);
         } else if (text.startsWith("/start")) {
-            sendMessage.setText("Press login to start");
-            sendMessage.setReplyMarkup(createLoggingKeyboard());
+            sendMessage.setText("Welcome. This bot will send you updates about bookings\n"
+                    + "Type '/login' to continue");
             sendMessage.setChatId(chatId);
+        } else if (text.startsWith("/login")) {
+            sendMessage.setText("Press me!");
+            sendMessage.setChatId(chatId);
+            sendMessage.setReplyMarkup(createLoggingKeyboard());
         }
         return sendMessage;
     }
