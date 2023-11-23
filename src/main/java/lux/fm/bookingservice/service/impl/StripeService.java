@@ -26,7 +26,7 @@ public class StripeService {
     private static final String STATUS_PAID = "paid";
     private static final BigDecimal CENTS_AMOUNT = BigDecimal.valueOf(100);
     private static final Long DEFAULT_QUANTITY = 1L;
-    private static final int EXPIRATION_TIME_IN_MINUTES = 10;
+    private static final int EXPIRATION_TIME_IN_MINUTES = 30;
     @Value("${stripe.secret.key}")
     private String stripeSecretKey;
 
