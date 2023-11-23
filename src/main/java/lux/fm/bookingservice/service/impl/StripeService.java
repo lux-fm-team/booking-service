@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Objects;
 import lux.fm.bookingservice.dto.payment.PaymentSessionDto;
+import lux.fm.bookingservice.exception.BookingException;
 import lux.fm.bookingservice.exception.PaymentException;
+import lux.fm.bookingservice.model.Booking;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -87,5 +89,13 @@ public class StripeService {
         LocalDateTime currentTime = LocalDateTime.now();
         LocalDateTime expirationTime = currentTime.plusMinutes(EXPIRATION_TIME_IN_MINUTES);
         return expirationTime.toEpochSecond(ZoneOffset.UTC);
+    }
+
+    public static void expireSession(Booking booking) {
+        try {
+            Session.retrieve(booking.getPayment().getSessionId()).expire();
+        } catch (StripeException e) {
+            throw new BookingException("Unsuccessful try to expire stripe session", e);
+        }
     }
 }

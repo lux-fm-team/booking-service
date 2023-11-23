@@ -91,7 +91,6 @@ public class BookingServiceImpl implements BookingService {
                 );
         if (booking.getPayment() != null
                 && booking.getPayment().getStatus().equals(Payment.Status.PENDING)) {
-            expireStripeSession(booking);
             throw new BookingException(
                     "Can't update booking until payment is completed");
         }
@@ -120,7 +119,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (booking.getPayment() != null) {
-            expireStripeSession(booking);
+            StripeService.expireSession(booking);
         }
 
         User user = (User) authentication.getPrincipal();
@@ -133,14 +132,6 @@ public class BookingServiceImpl implements BookingService {
         }
 
         bookingRepository.delete(booking);
-    }
-
-    private void expireStripeSession(Booking booking) {
-        try {
-            Session.retrieve(booking.getPayment().getSessionId()).expire();
-        } catch (StripeException e) {
-            throw new BookingException("Unsuccessful try to expire stripe session", e);
-        }
     }
 
     private Accommodation getAccommodation(Long id) {
