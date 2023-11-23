@@ -70,7 +70,7 @@ public class BookingServiceTest {
         user.setTelegramId(-1L);
         user.setPassword("password_alice");
         user.setRoles(Set.of());
-        user.setBooking(List.of());
+        user.setBookings(List.of());
         user.setEmail("user@gmail.com");
         user.setFirstName("Alice");
         user.setLastName("Blank");

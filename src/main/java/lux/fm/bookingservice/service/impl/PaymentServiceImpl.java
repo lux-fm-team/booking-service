@@ -66,7 +66,7 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentSessionDto paymentSessionDto = new PaymentSessionDto(
                 booking.getTotal(),
                 accommodation.getType() + ", " + accommodation.getLocation(),
-                "Size %s, Amenities: %s".formatted(
+                "Size: %s, Amenities: %s".formatted(
                         accommodation.getSize(),
                         String.join(", ", accommodation.getAmenities())
                 )
@@ -111,7 +111,7 @@ public class PaymentServiceImpl implements PaymentService {
                 sessionId, Payment.Status.PENDING)
                 .orElseThrow(() -> new PaymentException("Payment session not found"));
         Booking booking = payment.getBooking();
-        // @Todo: invalidate Stripe session
+        stripeService.expireSession(sessionId);
         paymentRepository.delete(payment);
         return bookingMapper.toDto(booking);
     }

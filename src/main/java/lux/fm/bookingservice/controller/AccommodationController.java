@@ -53,7 +53,7 @@ public class AccommodationController {
     @Operation(summary = "Get an accommodation by id", description =
             "Get exact accommodation by id")
     @GetMapping("/{id}")
-    public AccommodationDto getBookById(@Positive @PathVariable Long id) {
+    public AccommodationDto getById(@Positive @PathVariable Long id) {
         return accommodationService.findById(id);
     }
 

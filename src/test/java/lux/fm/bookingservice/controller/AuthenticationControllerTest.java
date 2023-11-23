@@ -30,7 +30,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Sql(scripts = "classpath:database/users/delete-user.sql",
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 public class AuthenticationControllerTest extends AbstractPostgresAwareTest {
     protected static MockMvc mockMvc;

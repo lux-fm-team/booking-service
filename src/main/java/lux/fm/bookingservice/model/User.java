@@ -46,7 +46,7 @@ public class User implements UserDetails {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Booking> booking = new ArrayList<>();
+    private List<Booking> bookings = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(

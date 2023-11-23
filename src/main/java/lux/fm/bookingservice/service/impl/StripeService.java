@@ -84,18 +84,18 @@ public class StripeService {
         }
     }
 
+    public void expireSession(String sessionId) {
+        try {
+            Session.retrieve(sessionId).expire();
+        } catch (StripeException e) {
+            throw new BookingException("Unsuccessful try to expire stripe session", e);
+        }
+    }
+
     // @Todo: Fix expiration
     private long getExpirationTime() {
         LocalDateTime currentTime = LocalDateTime.now();
         LocalDateTime expirationTime = currentTime.plusMinutes(EXPIRATION_TIME_IN_MINUTES);
         return expirationTime.toEpochSecond(ZoneOffset.UTC);
-    }
-
-    public static void expireSession(Booking booking) {
-        try {
-            Session.retrieve(booking.getPayment().getSessionId()).expire();
-        } catch (StripeException e) {
-            throw new BookingException("Unsuccessful try to expire stripe session", e);
-        }
     }
 }
