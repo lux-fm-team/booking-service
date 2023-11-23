@@ -40,7 +40,7 @@ public class StripeService {
         SessionCreateParams params =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setExpiresAt(getExpirationTime())
+                        .setExpiresAt(85000L)
                         .setSuccessUrl(
                                 uriComponentsBuilder.replacePath(SUCCESS_URL).build().toUriString()
                                         + "?sessionId={CHECKOUT_SESSION_ID}"
