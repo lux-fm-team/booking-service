@@ -33,4 +33,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking as b WHERE b.checkOut = :today ")
     @EntityGraph(attributePaths = "payment")
     List<Booking> checkExpiredBookings(@Param("today") LocalDate today);
+
+    Long countAllByUserEmail(String email);
 }

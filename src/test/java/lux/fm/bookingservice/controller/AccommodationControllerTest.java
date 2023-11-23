@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import lombok.SneakyThrows;
+import lux.fm.bookingservice.AbstractPostgresAwareTest;
 import lux.fm.bookingservice.dto.accommodation.AccommodationDto;
 import lux.fm.bookingservice.dto.accommodation.CreateAccommodationRequestDto;
 import lux.fm.bookingservice.dto.exception.ErrorResponseWrapper;
@@ -25,7 +26,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
@@ -35,12 +35,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = {
         "classpath:database/accommodations/delete-all-accommodations.sql"},
          executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @SqlMergeMode(MERGE)
-public class AccommodationControllerTest {
+public class AccommodationControllerTest extends AbstractPostgresAwareTest {
     protected static MockMvc mockMvc;
     private static ObjectMapper objectMapper;
 

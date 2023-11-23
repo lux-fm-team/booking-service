@@ -34,6 +34,7 @@ public class BookingServiceImpl implements BookingService {
     private final NotificationService notificationService;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
+    private final StripeService stripeService;
 
     @Override
     @Transactional
@@ -108,7 +109,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public void deleteBookingById(Authentication authentication, Long id) {
         Booking booking = bookingRepository.findByUserEmailAndId(
-                        authentication.getName(), id)
+                authentication.getName(), id)
                 .orElseThrow(() -> new EntityNotFoundException(
                                 "Booking with such id doesn't exist: " + id
                         )
@@ -119,14 +120,16 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (booking.getPayment() != null) {
-            StripeService.expireSession(booking);
+            stripeService.expireSession(booking.getPayment().getSessionId());
         }
 
         User user = userRepository.findByEmail(authentication.getName()).orElseThrow(
                 () -> new EntityNotFoundException("No user with such email"
                         + authentication.getName())
         );
-        if (user.getBooking().size() >= MAXIMUM_USER_BOOKINGS_CAPACITY) {
+        if (bookingRepository.countAllByUserEmail(authentication.getName())
+                >= MAXIMUM_USER_BOOKINGS_CAPACITY
+        ) {
             throw new BookingException("User can't have more than 5 bookings at a time");
         }
 
