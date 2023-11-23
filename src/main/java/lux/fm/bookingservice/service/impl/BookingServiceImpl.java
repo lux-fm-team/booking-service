@@ -18,6 +18,7 @@ import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.AccommodationRepository;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
+import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
 import org.springframework.security.core.Authentication;
@@ -32,6 +33,7 @@ public class BookingServiceImpl implements BookingService {
     private final AccommodationRepository accommodationRepository;
     private final NotificationService notificationService;
     private final PaymentRepository paymentRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -42,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
         validateUnpaidBookings(authentication);
 
         Accommodation accommodation = getAccommodation(request.accommodationId());
-        User user = (User) authentication.getPrincipal();
+        User user = userRepository.findByEmail(authentication.getName()).get();
 
         validateAvailablePlaces(accommodation, request.checkIn(), request.checkOut());
 
@@ -120,7 +122,10 @@ public class BookingServiceImpl implements BookingService {
             StripeService.expireSession(booking);
         }
 
-        User user = (User) authentication.getPrincipal();
+        User user = userRepository.findByEmail(authentication.getName()).orElseThrow(
+                () -> new EntityNotFoundException("No user with such email"
+                        + authentication.getName())
+        );
         if (user.getBooking().size() >= MAXIMUM_USER_BOOKINGS_CAPACITY) {
             throw new BookingException("User can't have more than 5 bookings at a time");
         }
@@ -154,9 +159,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void validateUnpaidBookings(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
         if (paymentRepository
-                .existsPaymentByBookingUserAndStatus(user, Payment.Status.PENDING)) {
+                .existsPaymentByBookingUserEmailAndStatus(authentication.getName(),
+                        Payment.Status.PENDING)) {
             throw new BookingException("You have a payment with status PENDING");
         }
     }

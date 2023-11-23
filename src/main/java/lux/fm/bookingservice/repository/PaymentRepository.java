@@ -3,7 +3,6 @@ package lux.fm.bookingservice.repository;
 import java.util.Optional;
 import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Payment;
-import lux.fm.bookingservice.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +15,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     Optional<Payment> findBySessionIdAndStatus(String sessionId, Payment.Status status);
 
-    Boolean existsPaymentByBookingUserAndStatus(User user, Payment.Status status);
+    Boolean existsPaymentByBookingUserEmailAndStatus(String email, Payment.Status status);
 
     Boolean existsByBooking(Booking booking);
 
