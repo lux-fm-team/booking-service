@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
+    private static final int MAXIMUM_USER_BOOKINGS_CAPACITY = 5;
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
@@ -86,6 +87,12 @@ public class BookingServiceImpl implements BookingService {
                                 "Booking with such id doesn't exist: " + id
                         )
                 );
+        if (booking.getPayment() != null
+                && booking.getPayment().getStatus().equals(Payment.Status.PENDING)) {
+            throw new BookingException(
+                    "Can't update booking until payment is completed");
+        }
+
         validateAvailablePlaces(
                 booking.getAccommodation(),
                 requestUpdateDto.checkIn(),
@@ -109,7 +116,14 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingException("Booking can't be deleted on this stage");
         }
 
+        if (booking.getPayment() != null) {
+            StripeService.expireSession(booking);
+        }
+
         User user = (User) authentication.getPrincipal();
+        if (user.getBooking().size() >= MAXIMUM_USER_BOOKINGS_CAPACITY) {
+            throw new BookingException("User can't have more than 5 bookings at a time");
+        }
 
         if (user.getTelegramId() != null) {
             notificationService.notifyAboutCanceledBooking(user.getTelegramId(), booking);
