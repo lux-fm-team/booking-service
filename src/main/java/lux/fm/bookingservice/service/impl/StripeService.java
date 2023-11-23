@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import lux.fm.bookingservice.dto.payment.PaymentSessionDto;
 import lux.fm.bookingservice.exception.BookingException;
 import lux.fm.bookingservice.exception.PaymentException;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+@Slf4j
 @Service
 public class StripeService {
     private static final String SUCCESS_URL = "/api/payments/success";
@@ -24,7 +26,7 @@ public class StripeService {
     private static final String STATUS_PAID = "paid";
     private static final BigDecimal CENTS_AMOUNT = BigDecimal.valueOf(100);
     private static final Long DEFAULT_QUANTITY = 1L;
-    private static final int EXPIRATION_TIME_IN_MINUTES = 10;
+    private static final int EXPIRATION_TIME_IN_MINUTES = 30;
     @Value("${stripe.secret.key}")
     private String stripeSecretKey;
 
@@ -71,6 +73,7 @@ public class StripeService {
         try {
             return Session.create(params);
         } catch (StripeException ex) {
+            log.error("Error during Stripe session creation: ",ex);
             throw new PaymentException("Cant create stripe session");
         }
     }
@@ -91,7 +94,6 @@ public class StripeService {
         }
     }
 
-    // @Todo: Fix expiration
     private long getExpirationTime() {
         LocalDateTime currentTime = LocalDateTime.now();
         LocalDateTime expirationTime = currentTime.plusMinutes(EXPIRATION_TIME_IN_MINUTES);
