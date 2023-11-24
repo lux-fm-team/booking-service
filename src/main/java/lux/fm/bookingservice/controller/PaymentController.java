@@ -49,7 +49,6 @@ public class PaymentController {
     }
 
     @GetMapping("/success")
-    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(
             summary = "Success endpoint after Stripe payment",
             description = """
@@ -61,7 +60,6 @@ public class PaymentController {
     }
 
     @GetMapping("/cancel")
-    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(
             summary = "Cancel payment after closing Stripe session",
             description = "It is redirect endpoint after Stripe cancel payment"
