@@ -38,7 +38,6 @@ public class StripeService {
     public Session createStripeSession(
             PaymentSessionDto requestDto,
             UriComponentsBuilder uriComponentsBuilder) {
-        log.info("logger message");
         SessionCreateParams params =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
@@ -75,7 +74,7 @@ public class StripeService {
             return Session.create(params);
         } catch (StripeException ex) {
             log.error("Error during Stripe session creation: ",ex);
-            throw new PaymentException("Cant create stripe session: " + ex.getMessage());
+            throw new PaymentException("Cant create stripe session");
         }
     }
 
