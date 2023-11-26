@@ -10,7 +10,7 @@
     </parent>
     <groupId>lux.fm</groupId>
     <artifactId>accommodation-booking-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.1.0-ALPHA</version>
     <name>accommodation-booking-service</name>
     <description>accommodation-booking-service</description>
     <properties>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots</artifactId>
-            <version>5.2.0</version>
+            <version>6.5.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.seratch</groupId>
@@ -83,10 +83,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -160,7 +156,7 @@
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>${liquibase.version}</version>
                 <configuration>
-                    <propertyFile>src/main/resources/liquibase.properties</propertyFile>
+                    <propertyFile>src/main/resources/liquibase.yml</propertyFile>
                 </configuration>
             </plugin>
             <plugin>

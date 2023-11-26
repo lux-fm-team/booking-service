@@ -87,10 +87,10 @@ The Booking Service is an application that provides functionality for managing p
 
 * **Programming language:** Java 17
 * **Spring Framework:** Spring Boot v3.1.5, Spring Data, Spring Security v6.1.5 (Authentication using JWT token)
-* **Database Management:** MySQL 8.0.33, Hibernate, Liquibase v4.20.0
+* **Database Management:** PostgreSQL 42.7.0, Hibernate, Liquibase v4.20.0
 * **Notification management:** Telegram bot 5.2.0
 * **Payment processing:** Stripe 22.3.0 
-* **Testing:** JUnit 5, Mockito, TestContainers v1.19.2, Postgres 42.7.0
+* **Testing:** JUnit 5, Mockito, TestContainers v1.19.2, PostgreSQL 42.7.0
 * **Deployment and Cloud Services:** Docker 3.8
 * **Additional instruments:** Maven, Lombok, Mapstruct
 * **Documentation:** Swagger

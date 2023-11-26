@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,7 +45,7 @@ public class UserController {
             summary = "Update your profile info",
             description = "Updates general information about your profile."
     )
-    @RequestMapping(value = "/me", method = {RequestMethod.PUT, RequestMethod.PATCH})
+    @PutMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('CUSTOMER')")
     public UserResponseDto updateMyProfile(@RequestBody @Valid UpdateUserRequestDto requestDto) {

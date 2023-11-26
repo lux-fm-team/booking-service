@@ -15,12 +15,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SchedulingServiceImpl implements SchedulingService {
+    private static final String MIDNIGHT_CRON = "0 0 0 * * ?";
     private static final int THREE_MINUTES_IN_MS = 180000;
     private final BookingRepository bookingRepository;
     private final NotificationService notificationService;
 
     @Override
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = MIDNIGHT_CRON)
     @Transactional
     public void checkExpiredBookings() {
         List<Booking> expiredBookings = bookingRepository.checkExpiredBookings(
