@@ -15,7 +15,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,7 +52,7 @@ public class Booking {
     private LocalDate checkOut;
 
     @Column(name = "time_to_live", nullable = false)
-    private LocalTime timeToLive = LocalTime.now().plusMinutes(20);
+    private LocalDateTime timeToLive = LocalDateTime.now().plusMinutes(20);
 
     @OneToOne(mappedBy = "booking", fetch = FetchType.LAZY,
             cascade = CascadeType.REMOVE, orphanRemoval = true

@@ -2,7 +2,7 @@ package lux.fm.bookingservice.service.impl;
 
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.model.Booking;
@@ -43,7 +43,7 @@ public class SchedulingServiceImpl implements SchedulingService {
     public void checkBookingLifeTime() {
         bookingRepository.deleteAll(
                 bookingRepository.findByStatusAndTimeToLiveBefore(
-                        Booking.Status.PENDING, LocalTime.now()
+                        Booking.Status.PENDING, LocalDateTime.now()
                 )
         );
     }

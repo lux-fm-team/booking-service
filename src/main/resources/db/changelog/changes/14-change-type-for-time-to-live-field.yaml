@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: change-type-booking-time-to-live-field
+      author: Maksym
+      changes:
+        - addColumn:
+            tableName: bookings
+            columns:
+              - column:
+                  name: time_to_live_timestamp
+                  type: timestamp
+        - update:
+            tableName: bookings
+            columns:
+              - column:
+                  name: time_to_live_timestamp
+                  valueComputed: "CAST('2023-11-26' AS DATE) + time_to_live"
+            where: "time_to_live IS NOT NULL"
+        - dropColumn:
+            tableName: bookings
+            columnName: time_to_live
+        - renameColumn:
+            tableName: bookings
+            oldColumnName: time_to_live_timestamp
+            newColumnName: time_to_live

@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -98,7 +98,7 @@ public class BookingServiceTest {
         booking.setCheckIn(requestDto.checkIn());
         booking.setCheckOut(requestDto.checkOut());
         booking.setAccommodation(accommodation);
-        booking.setTimeToLive(LocalTime.now().plusMinutes(5));
+        booking.setTimeToLive(LocalDateTime.now().plusMinutes(5));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class BookingServiceTest {
                 LocalDate.parse("2023-11-23"),
                 LocalDate.parse("2023-11-24"));
 
-        booking.setTimeToLive(LocalTime.now().plusMinutes(5));
+        booking.setTimeToLive(LocalDateTime.now().plusMinutes(5));
         List<Booking> bookings = List.of(booking);
         when(bookingRepository.findByUserEmailAndId(user.getEmail(), 1L))
                 .thenReturn(Optional.of(bookings.get(0)));

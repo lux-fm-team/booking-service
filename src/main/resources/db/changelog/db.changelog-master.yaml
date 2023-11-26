@@ -25,3 +25,5 @@ databaseChangeLog:
       file: db/changelog/changes/12-rename-life-time-column-in-bookings.yaml
   - include:
       file: db/changelog/changes/13-add-manager-role-to-db.yaml
+  - include:
+      file: db/changelog/changes/14-change-type-for-time-to-live-field.yaml
