@@ -3,7 +3,7 @@ version: "3.8"
 services:
   booking-service-db:
     container_name: booking-service-db
-    image: postgres
+    image: postgres:16.1
     restart: unless-stopped
     env_file: ./.env
     environment:
@@ -14,11 +14,12 @@ services:
       - $POSTGRES_LOCAL_PORT:$POSTGRES_DOCKER_PORT
 
   app:
+    container_name: app
     depends_on:
       - booking-service-db
     restart: on-failure
-    image: booking-service-app
     build: .
+    image: booking-service
     env_file: ./.env
     ports:
       - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
@@ -27,8 +28,6 @@ services:
       SPRING_APPLICATION_JSON: '{
              "spring.datasource.url" : "jdbc:postgresql://booking-service-db:$POSTGRES_LOCAL_PORT/$POSTGRES_DATABASE?createDatabaseIfNotExist=true",
              "spring.datasource.username" : "$POSTGRES_USERNAME",
-             "spring.datasource.password" : "$POSTGRES_PASSWORD",
-             "spring.datasource.driver-class-name": "org.postgresql.Driver",
-             "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect"
+             "spring.datasource.password" : "$POSTGRES_PASSWORD"
            }'
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
