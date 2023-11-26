@@ -5,4 +5,4 @@ INSERT INTO accommodations(id , location,type,size,daily_rate,availability,is_de
 values (1,'test', 'HOUSE',1,10,3,false);
 
 INSERT INTO bookings (id,user_id,accommodation_id,STATUS, check_in,check_out,time_to_live)
-VALUES(1,1,1,'PENDING','2023-11-23' , '2023-11-25','23:59:59');
+VALUES(1,1,1,'PENDING','2023-11-23' , '2023-11-25','2030-11-26 23:59:59');
