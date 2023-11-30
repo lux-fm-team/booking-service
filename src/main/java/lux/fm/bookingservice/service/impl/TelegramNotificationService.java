@@ -4,9 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Payment;
+import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.NotificationService;
 import lux.fm.bookingservice.telegram.Bot;
+import lux.fm.bookingservice.util.NotificationUtil;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,42 +19,46 @@ import org.springframework.stereotype.Service;
 public class TelegramNotificationService implements NotificationService {
     private final Bot bot;
     private final UserRepository userRepository;
+    private final NotificationUtil notificationUtil;
 
     @Override
-    public void notifyUser(Long id, String message) {
-        bot.sendMessageToUser(message, id);
+    public void notifyUser(User user, String message) {
+        if (user.getTelegramId() != null) {
+            bot.sendMessageToUser(message, user.getTelegramId());
+        }
     }
 
+    @Async
     public void notifyAllUsers(String message) {
         userRepository.findAllByTelegramIdIsNotNull()
-                .forEach(user -> notifyUser(user.getTelegramId(), message));
+                .forEach(user -> notifyUser(user, message));
     }
 
     @Override
-    public void notifyAboutCreatedBooking(Long userId, Booking booking) {
+    public void notifyAboutCreatedBooking(User user, Booking booking) {
         String message = """
                 ✅*You successfully booked accommodation*
                 Check info about it
-                %s""".formatted(getBookingInfo(booking)
+                %s""".formatted(notificationUtil.getBookingInfo(booking)
         );
-        notifyUser(userId, message);
+        notifyUser(user, message);
     }
 
     @Override
-    public void notifyAboutCanceledBooking(Long userId, Booking booking) {
+    public void notifyAboutCanceledBooking(User user, Booking booking) {
         String message = """
                 ⚠️*Your booking was canceled*
                 Check info about it
-                %s""".formatted(getBookingInfo(booking)
+                %s""".formatted(notificationUtil.getBookingInfo(booking)
         );
-        notifyUser(userId, message);
+        notifyUser(user, message);
     }
 
     @Override
     public void notifyAboutCreatedAccommodation(Accommodation accommodation) {
         String message = """
                 🆕*A new accommodation was created*
-                %s""".formatted(getAccommodationInfo(accommodation));
+                %s""".formatted(notificationUtil.getAccommodationInfo(accommodation));
         notifyAllUsers(message);
     }
 
@@ -57,46 +66,15 @@ public class TelegramNotificationService implements NotificationService {
     public void notifyAboutReleasedAccommodation(Accommodation accommodation) {
         String message = """
                 🆓*A new accommodation is available*
-                %s""".formatted(getAccommodationInfo(accommodation));
+                %s""".formatted(notificationUtil.getAccommodationInfo(accommodation));
         notifyAllUsers(message);
     }
 
     @Override
-    public void notifyAboutSuccessPayment(Long userId, Payment payment) {
+    public void notifyAboutSuccessPayment(User user, Payment payment) {
         // @Todo: Create better message
-        notifyUser(userId, """
+        notifyUser(user, """
                 ✅Payment for booking %d was successfully completed
                 """.formatted(payment.getBooking().getId()));
-    }
-
-    private String getBookingInfo(Booking booking) {
-        Accommodation accommodation = booking.getAccommodation();
-        return """
-                — 🌆`Location:` %s
-                — 🏚`Type:` %s
-                — 📅`Check in`: %s
-                — 📅`Check out:` %s
-                — 💰`Total:` $%.2f
-                """.formatted(
-                accommodation.getLocation(),
-                String.valueOf(accommodation.getType()),
-                booking.getCheckIn(),
-                booking.getCheckOut(),
-                booking.getTotal()
-        );
-    }
-
-    private String getAccommodationInfo(Accommodation accommodation) {
-        return """ 
-                — 🏚`Type:` %s
-                — 🌆`Location:` %2s
-                — 🚻`Size:` %3s
-                — 💸`Daily rate:` $%.2f"""
-                .formatted(
-                        accommodation.getType().name(),
-                        accommodation.getLocation(),
-                        accommodation.getSize(),
-                        accommodation.getDailyRate().doubleValue()
-                );
     }
 }

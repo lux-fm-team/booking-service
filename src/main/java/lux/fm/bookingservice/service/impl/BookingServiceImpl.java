@@ -2,8 +2,10 @@ package lux.fm.bookingservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+
 import java.time.LocalDate;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
@@ -21,6 +23,8 @@ import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -52,10 +56,9 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingMapper.toModel(request);
         booking.setUser(user);
         booking.setAccommodation(accommodation);
-
-        if (user.getTelegramId() != null) {
-            notificationService.notifyAboutCreatedBooking(user.getTelegramId(), booking);
-        }
+        long start = System.currentTimeMillis();
+        notificationService.notifyAboutCreatedBooking(user, booking);
+        System.out.println(System.currentTimeMillis() - start);
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
 
@@ -109,7 +112,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public void deleteBookingById(Authentication authentication, Long id) {
         Booking booking = bookingRepository.findByUserEmailAndId(
-                authentication.getName(), id)
+                        authentication.getName(), id)
                 .orElseThrow(() -> new EntityNotFoundException(
                                 "Booking with such id doesn't exist: " + id
                         )
@@ -132,11 +135,7 @@ public class BookingServiceImpl implements BookingService {
         ) {
             throw new BookingException("User can't have more than 5 bookings at a time");
         }
-
-        if (user.getTelegramId() != null) {
-            notificationService.notifyAboutCanceledBooking(user.getTelegramId(), booking);
-        }
-
+        notificationService.notifyAboutCanceledBooking(user, booking);
         bookingRepository.delete(booking);
     }
 

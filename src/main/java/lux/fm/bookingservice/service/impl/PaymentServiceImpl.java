@@ -5,9 +5,11 @@ import static lux.fm.bookingservice.model.Booking.Status;
 import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.dto.payment.CreatePaymentRequestDto;
@@ -20,6 +22,7 @@ import lux.fm.bookingservice.mapper.PaymentMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Payment;
+import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.service.NotificationService;
@@ -47,7 +50,7 @@ public class PaymentServiceImpl implements PaymentService {
             UriComponentsBuilder uriComponentsBuilder
     ) {
         Booking booking = bookingRepository.findByUserEmailAndId(
-                authentication.getName(), requestDto.bookingId())
+                        authentication.getName(), requestDto.bookingId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Booking with such id doesn't exist: " + requestDto.bookingId())
                 );
@@ -58,7 +61,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (paymentRepository.existsByBooking(booking)) {
             throw new PaymentException("You already have payment with booking id %d"
-                            .formatted(booking.getId())
+                    .formatted(booking.getId())
             );
         }
 
@@ -95,12 +98,8 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setSessionId(UUID.randomUUID().toString());
         Booking booking = payment.getBooking();
         booking.setStatus(Status.CONFIRMED);
-
-        Long telegramId = booking.getUser().getTelegramId();
-        if (telegramId != null) {
-            notificationService.notifyAboutSuccessPayment(telegramId, payment);
-        }
-
+        User user = booking.getUser();
+        notificationService.notifyAboutSuccessPayment(user, payment);
         return paymentMapper.toDtoWithoutSession(payment);
     }
 
@@ -108,7 +107,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public BookingResponseDto cancelPayment(String sessionId) {
         Payment payment = paymentRepository.findBySessionIdAndStatus(
-                sessionId, Payment.Status.PENDING)
+                        sessionId, Payment.Status.PENDING)
                 .orElseThrow(() -> new PaymentException("Payment session not found"));
         Booking booking = payment.getBooking();
         stripeService.expireSession(sessionId);

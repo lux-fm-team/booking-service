@@ -6,7 +6,6 @@ import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Payment;
 import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.service.NotificationService;
-import lux.fm.bookingservice.service.UserService;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 

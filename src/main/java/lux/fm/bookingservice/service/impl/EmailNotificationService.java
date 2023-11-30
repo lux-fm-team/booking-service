@@ -26,7 +26,6 @@ public class EmailNotificationService implements NotificationService {
     }
 
     @Override
-    @Async
     public void notifyAllUsers(String message) {
         userRepository.findAll()
                 .forEach(user -> sendEmail(user.getEmail(), message));
@@ -49,7 +48,6 @@ public class EmailNotificationService implements NotificationService {
     }
 
 
-    @Async
     @Override
     public void notifyAboutCreatedAccommodation(Accommodation accommodation) {
         userRepository.findAll()
@@ -63,7 +61,6 @@ public class EmailNotificationService implements NotificationService {
                 );
     }
 
-    @Async
     @Override
     public void notifyAboutReleasedAccommodation(Accommodation accommodation) {
         userRepository.findAll()
