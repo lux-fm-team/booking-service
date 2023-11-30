@@ -10,7 +10,6 @@ import lux.fm.bookingservice.service.NotificationService;
 import lux.fm.bookingservice.util.NotificationUtil;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -46,7 +45,6 @@ public class EmailNotificationService implements NotificationService {
                 %s""".formatted(notificationUtil.getBookingInfo(booking))
         );
     }
-
 
     @Override
     public void notifyAboutCreatedAccommodation(Accommodation accommodation) {

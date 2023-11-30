@@ -9,9 +9,7 @@ import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.NotificationService;
 import lux.fm.bookingservice.telegram.Bot;
 import lux.fm.bookingservice.util.NotificationUtil;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 @Service

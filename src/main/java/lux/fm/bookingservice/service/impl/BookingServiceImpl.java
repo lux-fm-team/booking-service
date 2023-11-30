@@ -2,10 +2,8 @@ package lux.fm.bookingservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingRequestCreateDto;
 import lux.fm.bookingservice.dto.booking.BookingRequestUpdateDto;
@@ -23,8 +21,6 @@ import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -56,9 +52,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingMapper.toModel(request);
         booking.setUser(user);
         booking.setAccommodation(accommodation);
-        long start = System.currentTimeMillis();
         notificationService.notifyAboutCreatedBooking(user, booking);
-        System.out.println(System.currentTimeMillis() - start);
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
 

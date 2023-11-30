@@ -5,11 +5,9 @@ import static lux.fm.bookingservice.model.Booking.Status;
 import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import lux.fm.bookingservice.dto.booking.BookingResponseDto;
 import lux.fm.bookingservice.dto.payment.CreatePaymentRequestDto;
