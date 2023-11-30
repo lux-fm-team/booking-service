@@ -34,14 +34,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
-@Sql(scripts = {"classpath:database/bookings/delete-accommodation.sql",
-        "classpath:database/users/delete-user.sql",
-        "classpath:database/bookings/delete-bookings.sql"},
-        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(scripts = {"classpath:database/users/add-user.sql",
-        "classpath:database/bookings/add-accommodation.sql",
-        "classpath:database/bookings/add-bookings.sql"})
+        "classpath:database/accommodations/add-one-accommodation.sql"
+})
+@Sql(scripts = "classpath:database/bookings/delete-bookings.sql",
+        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 public class BookingControllerTest extends AbstractPostgresAwareTest {
     protected static MockMvc mockMvc;
     private static ObjectMapper objectMapper;
@@ -56,7 +54,6 @@ public class BookingControllerTest extends AbstractPostgresAwareTest {
         objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     }
 
-    @Sql(scripts = {"classpath:database/bookings/delete-bookings.sql"})
     @Test
     @DisplayName("Create new booking")
     @WithMockUser(username = "test@check.com", roles = {"CUSTOMER"})
@@ -86,6 +83,7 @@ public class BookingControllerTest extends AbstractPostgresAwareTest {
     @Test
     @DisplayName("Find by id")
     @WithMockUser(username = "test@check.com", roles = {"CUSTOMER"})
+    @Sql(scripts = "classpath:database/bookings/add-one-booking.sql")
     void findUserBookingById() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/api/bookings/" + 1L))
                 .andExpect(status().isOk())
@@ -104,6 +102,7 @@ public class BookingControllerTest extends AbstractPostgresAwareTest {
     @Test
     @DisplayName("Find all user's bookings ")
     @WithMockUser(username = "test@check.com", roles = {"CUSTOMER"})
+    @Sql(scripts = "classpath:database/bookings/add-bookings.sql")
     void findUserBookings() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/api/bookings/my"))
                 .andExpect(status().isOk())
@@ -116,20 +115,21 @@ public class BookingControllerTest extends AbstractPostgresAwareTest {
                 .element(1)
                 .hasFieldOrPropertyWithValue("status", Booking.Status.PENDING)
                 .hasFieldOrPropertyWithValue("accommodationId", 1L)
-                .hasFieldOrPropertyWithValue("checkIn", LocalDate.of(2023, 11, 24))
-                .hasFieldOrPropertyWithValue("checkOut", LocalDate.of(2023, 11, 25));
+                .hasFieldOrPropertyWithValue("checkIn", LocalDate.of(2123, 11, 24))
+                .hasFieldOrPropertyWithValue("checkOut", LocalDate.of(2123, 11, 26));
         assertThat(response).isNotNull()
                 .hasSize(3)
                 .element(0)
                 .hasFieldOrPropertyWithValue("status", Booking.Status.CONFIRMED)
                 .hasFieldOrPropertyWithValue("accommodationId", 1L)
-                .hasFieldOrPropertyWithValue("checkIn", LocalDate.of(2023, 11, 26))
-                .hasFieldOrPropertyWithValue("checkOut", LocalDate.of(2023, 11, 27));
+                .hasFieldOrPropertyWithValue("checkIn", LocalDate.of(2123, 11, 24))
+                .hasFieldOrPropertyWithValue("checkOut", LocalDate.of(2123, 11, 27));
     }
 
     @Test
     @DisplayName("Find by user id and status")
     @WithMockUser(username = "test@check.com", roles = {"MANAGER"})
+    @Sql(scripts = "classpath:database/bookings/add-bookings.sql")
     void findBookingByUserIdAndStatus() throws Exception {
         Long id = 1L;
         Booking.Status status = Booking.Status.PENDING;
@@ -152,21 +152,22 @@ public class BookingControllerTest extends AbstractPostgresAwareTest {
                 .hasFieldOrPropertyWithValue("id", 1L)
                 .hasFieldOrPropertyWithValue("status", Booking.Status.PENDING)
                 .hasFieldOrPropertyWithValue("accommodationId", 1L)
-                .hasFieldOrPropertyWithValue("checkIn", LocalDate.of(2023, 11, 24))
-                .hasFieldOrPropertyWithValue("checkOut", LocalDate.of(2023, 11, 25));
+                .hasFieldOrPropertyWithValue("checkIn", LocalDate.of(2123, 11, 24))
+                .hasFieldOrPropertyWithValue("checkOut", LocalDate.of(2123, 11, 26));
 
         assertThat(response).isNotNull()
                 .element(1)
                 .hasFieldOrPropertyWithValue("id", 3L)
                 .hasFieldOrPropertyWithValue("status", Booking.Status.PENDING)
                 .hasFieldOrPropertyWithValue("accommodationId", 1L)
-                .hasFieldOrPropertyWithValue("checkIn", LocalDate.of(2023, 11, 28))
-                .hasFieldOrPropertyWithValue("checkOut", LocalDate.of(2023, 11, 29));
+                .hasFieldOrPropertyWithValue("checkIn", LocalDate.of(2123, 11, 24))
+                .hasFieldOrPropertyWithValue("checkOut", LocalDate.of(2123, 11, 29));
     }
 
     @Test
     @DisplayName("Update booking ")
     @WithMockUser(username = "test@check.com", roles = {"CUSTOMER"})
+    @Sql(scripts = "classpath:database/bookings/add-one-booking.sql")
     void updateBooking() throws Exception {
         long id = 1L;
         BookingRequestUpdateDto updateDto = new BookingRequestUpdateDto(
@@ -208,11 +209,12 @@ public class BookingControllerTest extends AbstractPostgresAwareTest {
     @Test
     @DisplayName("Create conflicting booking")
     @WithMockUser(username = "test@check.com", roles = {"CUSTOMER"})
+    @Sql(scripts = "classpath:database/bookings/add-bookings.sql")
     void createConflictingBooking() throws Exception {
         BookingRequestCreateDto requestDto = new BookingRequestCreateDto(
                 1L,
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(5)
+                LocalDate.parse("2123-11-24"),
+                LocalDate.parse("2123-11-30")
         );
         MvcResult mvcResult = mockMvc.perform(post("/api/bookings")
                         .content(objectMapper.writeValueAsString(requestDto))
@@ -227,9 +229,10 @@ public class BookingControllerTest extends AbstractPostgresAwareTest {
     }
 
     @Test
-    @DisplayName("Delete pending booking")
+    @DisplayName("Delete confirmed booking")
     @WithMockUser(username = "test@check.com", roles = {"CUSTOMER"})
-    void deletePendingBooking() throws Exception {
+    @Sql(scripts = "classpath:database/bookings/add-bookings.sql")
+    void deleteConfirmedBooking() throws Exception {
         long id = 2;
         MvcResult mvcResult = mockMvc.perform(delete("/api/bookings/" + id))
                 .andExpect(status().isBadRequest())
