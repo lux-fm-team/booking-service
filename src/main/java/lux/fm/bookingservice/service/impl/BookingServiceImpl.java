@@ -21,6 +21,7 @@ import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,10 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
-    private final NotificationService notificationService;
+    @Qualifier("telegramNotificationService")
+    private final NotificationService telegramNotificationService;
+    @Qualifier("emailNotificationService")
+    private final NotificationService emailNotificationService;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final StripeService stripeService;
@@ -52,7 +56,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingMapper.toModel(request);
         booking.setUser(user);
         booking.setAccommodation(accommodation);
-        notificationService.notifyAboutCreatedBooking(user, booking);
+        emailNotificationService.notifyAboutCreatedBooking(user, booking);
+        telegramNotificationService.notifyAboutCreatedBooking(user, booking);
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
 
@@ -129,7 +134,8 @@ public class BookingServiceImpl implements BookingService {
         ) {
             throw new BookingException("User can't have more than 5 bookings at a time");
         }
-        notificationService.notifyAboutCanceledBooking(user, booking);
+        emailNotificationService.notifyAboutCanceledBooking(user, booking);
+        telegramNotificationService.notifyAboutCanceledBooking(user, booking);
         bookingRepository.delete(booking);
     }
 

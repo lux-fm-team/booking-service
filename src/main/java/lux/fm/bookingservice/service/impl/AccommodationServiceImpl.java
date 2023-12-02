@@ -10,6 +10,7 @@ import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.repository.AccommodationRepository;
 import lux.fm.bookingservice.service.AccommodationService;
 import lux.fm.bookingservice.service.NotificationService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,12 @@ import org.springframework.stereotype.Service;
 public class AccommodationServiceImpl implements AccommodationService {
     private final AccommodationRepository accommodationRepository;
     private final AccommodationMapper accommodationMapper;
-    private final NotificationService notificationService;
-
+    @Qualifier("telegramNotificationService")
+    private final NotificationService telegramNotificationService;
     @Override
     public AccommodationDto save(CreateAccommodationRequestDto accommodationRequestDto) {
         Accommodation accommodation = accommodationMapper.toAccommodation(accommodationRequestDto);
-        notificationService.notifyAboutCreatedAccommodation(accommodation);
+        telegramNotificationService.notifyAboutCreatedAccommodation(accommodation);
         return accommodationMapper.toDto(accommodationRepository.save(accommodation));
     }
 

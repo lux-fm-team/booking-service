@@ -25,6 +25,7 @@ import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.service.NotificationService;
 import lux.fm.bookingservice.service.PaymentService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final BookingMapper bookingMapper;
     private final StripeService stripeService;
-    private final NotificationService notificationService;
+    @Qualifier("telegramNotificationService")
+    private final NotificationService telegramNotificationService;
 
     @Override
     @Transactional
@@ -97,7 +99,7 @@ public class PaymentServiceImpl implements PaymentService {
         Booking booking = payment.getBooking();
         booking.setStatus(Status.CONFIRMED);
         User user = booking.getUser();
-        notificationService.notifyAboutSuccessPayment(user, payment);
+        telegramNotificationService.notifyAboutSuccessPayment(user, payment);
         return paymentMapper.toDtoWithoutSession(payment);
     }
 
