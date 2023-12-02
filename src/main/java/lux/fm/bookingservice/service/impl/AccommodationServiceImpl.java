@@ -21,6 +21,7 @@ public class AccommodationServiceImpl implements AccommodationService {
     private final AccommodationMapper accommodationMapper;
     @Qualifier("telegramNotificationService")
     private final NotificationService telegramNotificationService;
+
     @Override
     public AccommodationDto save(CreateAccommodationRequestDto accommodationRequestDto) {
         Accommodation accommodation = accommodationMapper.toAccommodation(accommodationRequestDto);

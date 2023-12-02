@@ -35,8 +35,8 @@ public class SchedulingServiceImpl implements SchedulingService {
         } else {
             expiredBookings.forEach(booking -> {
                 booking.setStatus(Booking.Status.EXPIRED);
-               telegramNotificationService.
-                       notifyAboutReleasedAccommodation(booking.getAccommodation());
+                telegramNotificationService
+                        .notifyAboutReleasedAccommodation(booking.getAccommodation());
             });
         }
     }
