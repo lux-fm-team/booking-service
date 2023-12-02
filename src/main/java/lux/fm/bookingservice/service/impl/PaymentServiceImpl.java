@@ -20,10 +20,12 @@ import lux.fm.bookingservice.mapper.PaymentMapper;
 import lux.fm.bookingservice.model.Accommodation;
 import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.model.Payment;
+import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.service.NotificationService;
 import lux.fm.bookingservice.service.PaymentService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final BookingMapper bookingMapper;
     private final StripeService stripeService;
-    private final NotificationService notificationService;
+    @Qualifier("telegramNotificationService")
+    private final NotificationService telegramNotificationService;
 
     @Override
     @Transactional
@@ -47,7 +50,7 @@ public class PaymentServiceImpl implements PaymentService {
             UriComponentsBuilder uriComponentsBuilder
     ) {
         Booking booking = bookingRepository.findByUserEmailAndId(
-                authentication.getName(), requestDto.bookingId())
+                        authentication.getName(), requestDto.bookingId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Booking with such id doesn't exist: " + requestDto.bookingId())
                 );
@@ -58,7 +61,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (paymentRepository.existsByBooking(booking)) {
             throw new PaymentException("You already have payment with booking id %d"
-                            .formatted(booking.getId())
+                    .formatted(booking.getId())
             );
         }
 
@@ -95,12 +98,8 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setSessionId(UUID.randomUUID().toString());
         Booking booking = payment.getBooking();
         booking.setStatus(Status.CONFIRMED);
-
-        Long telegramId = booking.getUser().getTelegramId();
-        if (telegramId != null) {
-            notificationService.notifyAboutSuccessPayment(telegramId, payment);
-        }
-
+        User user = booking.getUser();
+        telegramNotificationService.notifyAboutSuccessPayment(user, payment);
         return paymentMapper.toDtoWithoutSession(payment);
     }
 
@@ -108,7 +107,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public BookingResponseDto cancelPayment(String sessionId) {
         Payment payment = paymentRepository.findBySessionIdAndStatus(
-                sessionId, Payment.Status.PENDING)
+                        sessionId, Payment.Status.PENDING)
                 .orElseThrow(() -> new PaymentException("Payment session not found"));
         Booking booking = payment.getBooking();
         stripeService.expireSession(sessionId);

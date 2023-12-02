@@ -9,6 +9,7 @@ import lux.fm.bookingservice.model.Booking;
 import lux.fm.bookingservice.repository.BookingRepository;
 import lux.fm.bookingservice.service.NotificationService;
 import lux.fm.bookingservice.service.SchedulingService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,8 @@ public class SchedulingServiceImpl implements SchedulingService {
     private static final String MIDNIGHT_CRON = "0 0 0 * * ?";
     private static final int THREE_MINUTES_IN_MS = 180000;
     private final BookingRepository bookingRepository;
-    private final NotificationService notificationService;
+    @Qualifier("telegramNotificationService")
+    private final NotificationService telegramNotificationService;
 
     @Override
     @Scheduled(cron = MIDNIGHT_CRON)
@@ -28,12 +30,13 @@ public class SchedulingServiceImpl implements SchedulingService {
                 LocalDate.now().minusDays(1)
         );
         if (expiredBookings.isEmpty()) {
-            notificationService.notifyAllUsers("""
+            telegramNotificationService.notifyAllUsers("""
                     ⚠️No expired bookings since yesterday!""");
         } else {
             expiredBookings.forEach(booking -> {
                 booking.setStatus(Booking.Status.EXPIRED);
-                notificationService.notifyAboutReleasedAccommodation(booking.getAccommodation());
+                telegramNotificationService
+                        .notifyAboutReleasedAccommodation(booking.getAccommodation());
             });
         }
     }

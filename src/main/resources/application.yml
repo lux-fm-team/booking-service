@@ -10,6 +10,17 @@ spring:
       ddl-auto: validate
     show-sql: true
     open-in-view: false
+  mail:
+    host: ${SMTP_HOST}
+    port: 2525
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 #Swagger Config
 springdoc:

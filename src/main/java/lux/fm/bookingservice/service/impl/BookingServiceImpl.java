@@ -21,6 +21,7 @@ import lux.fm.bookingservice.repository.PaymentRepository;
 import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.BookingService;
 import lux.fm.bookingservice.service.NotificationService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,10 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final AccommodationRepository accommodationRepository;
-    private final NotificationService notificationService;
+    @Qualifier("telegramNotificationService")
+    private final NotificationService telegramNotificationService;
+    @Qualifier("emailNotificationService")
+    private final NotificationService emailNotificationService;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final StripeService stripeService;
@@ -52,10 +56,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingMapper.toModel(request);
         booking.setUser(user);
         booking.setAccommodation(accommodation);
-
-        if (user.getTelegramId() != null) {
-            notificationService.notifyAboutCreatedBooking(user.getTelegramId(), booking);
-        }
+        emailNotificationService.notifyAboutCreatedBooking(user, booking);
+        telegramNotificationService.notifyAboutCreatedBooking(user, booking);
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
 
@@ -109,7 +111,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public void deleteBookingById(Authentication authentication, Long id) {
         Booking booking = bookingRepository.findByUserEmailAndId(
-                authentication.getName(), id)
+                        authentication.getName(), id)
                 .orElseThrow(() -> new EntityNotFoundException(
                                 "Booking with such id doesn't exist: " + id
                         )
@@ -132,11 +134,8 @@ public class BookingServiceImpl implements BookingService {
         ) {
             throw new BookingException("User can't have more than 5 bookings at a time");
         }
-
-        if (user.getTelegramId() != null) {
-            notificationService.notifyAboutCanceledBooking(user.getTelegramId(), booking);
-        }
-
+        emailNotificationService.notifyAboutCanceledBooking(user, booking);
+        telegramNotificationService.notifyAboutCanceledBooking(user, booking);
         bookingRepository.delete(booking);
     }
 
