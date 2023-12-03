@@ -20,13 +20,13 @@ public class TelegramNotificationService implements NotificationService {
     private final NotificationUtil notificationUtil;
 
     @Override
+    @Async
     public void notifyUser(User user, String message) {
         if (user.getTelegramId() != null) {
             bot.sendMessageToUser(message, user.getTelegramId());
         }
     }
 
-    @Async
     public void notifyAllUsers(String message) {
         userRepository.findAllByTelegramIdIsNotNull()
                 .forEach(user -> notifyUser(user, message));

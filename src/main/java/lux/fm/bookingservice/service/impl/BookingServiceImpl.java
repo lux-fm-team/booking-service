@@ -47,15 +47,20 @@ public class BookingServiceImpl implements BookingService {
             BookingRequestCreateDto request
     ) {
         validateUnpaidBookings(authentication);
-
         Accommodation accommodation = getAccommodation(request.accommodationId());
-        User user = userRepository.findByEmail(authentication.getName()).get();
-
         validateAvailablePlaces(accommodation, request.checkIn(), request.checkOut());
 
+        if (bookingRepository.countAllByUserEmail(authentication.getName())
+                >= MAXIMUM_USER_BOOKINGS_CAPACITY
+        ) {
+            throw new BookingException("User can't have more than 5 bookings at a time");
+        }
+
         Booking booking = bookingMapper.toModel(request);
+        User user = findUserByEmail(authentication.getName());
         booking.setUser(user);
         booking.setAccommodation(accommodation);
+
         emailNotificationService.notifyAboutCreatedBooking(user, booking);
         telegramNotificationService.notifyAboutCreatedBooking(user, booking);
         return bookingMapper.toDto(bookingRepository.save(booking));
@@ -110,6 +115,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public void deleteBookingById(Authentication authentication, Long id) {
+        User user = findUserByEmail(authentication.getName());
         Booking booking = bookingRepository.findByUserEmailAndId(
                         authentication.getName(), id)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -125,18 +131,16 @@ public class BookingServiceImpl implements BookingService {
             stripeService.expireSession(booking.getPayment().getSessionId());
         }
 
-        User user = userRepository.findByEmail(authentication.getName()).orElseThrow(
-                () -> new EntityNotFoundException("No user with such email"
-                        + authentication.getName())
-        );
-        if (bookingRepository.countAllByUserEmail(authentication.getName())
-                >= MAXIMUM_USER_BOOKINGS_CAPACITY
-        ) {
-            throw new BookingException("User can't have more than 5 bookings at a time");
-        }
         emailNotificationService.notifyAboutCanceledBooking(user, booking);
         telegramNotificationService.notifyAboutCanceledBooking(user, booking);
         bookingRepository.delete(booking);
+    }
+
+    private User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "User with such email %s doesn't exist".formatted(email))
+                );
     }
 
     private Accommodation getAccommodation(Long id) {
