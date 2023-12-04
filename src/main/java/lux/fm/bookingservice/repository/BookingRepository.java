@@ -26,8 +26,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByStatusAndTimeToLiveBefore(Booking.Status status, LocalDateTime time);
 
     @Query("SELECT COUNT(b) from Booking as b where b.accommodation.id = :accommodationId "
-            + "AND ((b.checkIn between :checkIn and :checkOut) "
-            + "OR (b.checkOut between :checkIn and :checkOut))")
+            + "AND :checkIn < b.checkOut AND :checkOut > b.checkIn")
     Long countBookingsInDateRange(Long accommodationId, LocalDate checkIn, LocalDate checkOut);
 
     @Query("SELECT b FROM Booking as b WHERE b.checkOut = :today ")

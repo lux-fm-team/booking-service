@@ -7,40 +7,39 @@ import lux.fm.bookingservice.model.Payment;
 import lux.fm.bookingservice.model.User;
 import lux.fm.bookingservice.repository.UserRepository;
 import lux.fm.bookingservice.service.NotificationService;
+import lux.fm.bookingservice.util.EmailUtil;
 import lux.fm.bookingservice.util.NotificationUtil;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
 public class EmailNotificationService implements NotificationService {
-    private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
     private final NotificationUtil notificationUtil;
+    private final EmailUtil emailUtil;
 
     @Override
     public void notifyUser(User user, String message) {
-        sendEmail(user.getEmail(), message);
+        emailUtil.sendEmail(user.getEmail(),"Subject", message);
     }
 
     @Override
     public void notifyAllUsers(String message) {
         userRepository.findAll()
-                .forEach(user -> sendEmail(user.getEmail(), message));
+                .forEach(user -> notifyUser(user, message));
     }
 
     @Override
     public void notifyAboutCreatedBooking(User user, Booking booking) {
-        sendEmail(user.getEmail(), """
-                Your booking was created:
-                %s""".formatted(notificationUtil.getBookingInfo(booking))
+        emailUtil.sendEmail(user.getEmail(),
+                "Created new booking",
+                notificationUtil.getBookingInfo(booking)
         );
     }
 
     @Override
     public void notifyAboutCanceledBooking(User user, Booking booking) {
-        sendEmail(user.getEmail(), """
+        emailUtil.sendEmail(user.getEmail(), "Canceling booking", """
                 Your booking was canceled:
                 %s""".formatted(notificationUtil.getBookingInfo(booking))
         );
@@ -50,7 +49,7 @@ public class EmailNotificationService implements NotificationService {
     public void notifyAboutCreatedAccommodation(Accommodation accommodation) {
         userRepository.findAll()
                 .forEach(user ->
-                        sendEmail(user.getEmail(), """
+                        emailUtil.sendEmail(user.getEmail(), "Accommodation", """
                                         Following accommodation was created:
                                         %s""".formatted(
                                         notificationUtil.getAccommodationInfo(accommodation)
@@ -63,7 +62,9 @@ public class EmailNotificationService implements NotificationService {
     public void notifyAboutReleasedAccommodation(Accommodation accommodation) {
         userRepository.findAll()
                 .forEach(user ->
-                        sendEmail(user.getEmail(), """
+                        emailUtil.sendEmail(user.getEmail(),
+                                "Releasing accommodation",
+                                        """
                                         Following accommodation now have empty slots
                                         %s""".formatted(
                                         notificationUtil.getAccommodationInfo(accommodation)
@@ -75,14 +76,5 @@ public class EmailNotificationService implements NotificationService {
     @Override
     public void notifyAboutSuccessPayment(User user, Payment payment) {
 
-    }
-
-    public void sendEmail(String to, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("sender@example.com");
-        message.setTo(to);
-        message.setSubject("Booking.example");
-        message.setText(text);
-        javaMailSender.send(message);
     }
 }
