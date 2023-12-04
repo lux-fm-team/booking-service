@@ -179,9 +179,9 @@ The Booking Service is an application that provides functionality for managing p
 
 Access the AWS deployment at http://ec2-3-94-255-245.compute-1.amazonaws.com/swagger-ui/index.html
 
-Here you can find out telegram bot: https://t.me/lux_fm_booking_bot
+Here you can find our telegram bot: https://t.me/lux_fm_booking_bot
 
-If you want test admin endpoints, use the following credentials:
+If you want to test admin endpoints, use the following credentials:
 
 - **Email:** admin@gmail.com
 - **Password:** 123456
